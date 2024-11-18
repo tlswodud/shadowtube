@@ -1,8 +1,8 @@
 import streamlit as st
 
+
+from youtube_transcript_api import YouTubeTranscriptApi
 import yt_dlp
-
-
 
 def get_video_info(url):
     try:
@@ -80,7 +80,7 @@ def create_modern_ui():
             with st.container():
                 col1, col2 = st.columns([1, 3])
                 with col1:
-                    st.image(video_info['thumbnail'], width=160)
+                    st.image(video_info['thumbnail'], width=120)
                 with col2:
                     st.markdown(f"#### {video_info['title']}")
                     st.caption(f"📺 {video_info['channel']}")
@@ -98,7 +98,7 @@ def create_modern_ui():
     # 도움말 섹션
     with st.expander("ℹ️ How to use"):
         st.markdown("""
-        1. Paste your free Gemini API Key.            
+        1. Paste your free Gemini API             
         2. Select your native language
         3. Choose the language you want to learn
         4. Paste a YouTube URL
@@ -112,7 +112,7 @@ def get_language_code(language):
         "한국어": "ko",
         "English": "en",
         "日本語": "ja",
-        "中文": "zh-Hans",
+        "中文": "zh",
         "Español": "es",
         "Français": "fr"
     }
@@ -200,7 +200,7 @@ from docx.oxml import OxmlElement
 
 
 
-def create_word_file_shadow_script(content, utb_title, learn_code, want_font, native_font, font_size): 
+def create_word_file_shadow_script(content, utb_title, learn_code, want_font, native_font, font_size):
     """
     각 언어에 맞는 폰트를 설정하여 워드 파일 생성
     content: 텍스트 내용
@@ -239,6 +239,8 @@ def create_word_file_shadow_script(content, utb_title, learn_code, want_font, na
                     break
         return max(counts, key=counts.get)  # 가장 빈도가 높은 언어 반환
 
+    #content = content.splitline()
+    
     # 각 줄에 대해 처리
     for line in content:
         paragraph = doc.add_paragraph()
@@ -249,7 +251,7 @@ def create_word_file_shadow_script(content, utb_title, learn_code, want_font, na
         dominant_language = get_dominant_language(line)
 
         # 학습 언어와 동일하면 학습 폰트, 아니면 모국어 폰트 적용
-        
+        #font_name = want_font if dominant_language == learn_code else native_font
         if dominant_language == learn_code:
              font_name = want_font
         else:
@@ -658,7 +660,11 @@ video_id = get_video_id(user_input)
 title_video = get_video_title(video_id)
 
 
+en_code = get_best_english_encode(video_id)
 
+eng_script = get_best_english_transcript(video_id)
+
+eng_script_no_time = get_best_english_transcript_no_time(video_id)
 
 
 def target_translate_isavailable(video_id):
@@ -925,7 +931,7 @@ def gemini_translate_text(_model, result_eng_transcript, generation_config):
         translated_text: 번역된 텍스트가 포함된 문자열
     """
     # 텍스트를 chunk_size 크기로 분할
-    chunk_size= 200
+    chunk_size= 300
     chunks_script = [result_eng_transcript[i:i + chunk_size] for i in range(0, len(result_eng_transcript), chunk_size)]
     response_text = []
 
@@ -936,7 +942,7 @@ def gemini_translate_text(_model, result_eng_transcript, generation_config):
                 f"""
                         당신은 전문 번역가입니다. 다음 텍스트를 번역해주세요.
                         
-                       
+    
 
                         원본 텍스트: " {chunk}"
 
@@ -946,12 +952,6 @@ def gemini_translate_text(_model, result_eng_transcript, generation_config):
                         3. 문화적 맥락을 고려하여 적절한 표현으로 변환하세요.
                         4. 존댓말이나 격식체의 수준을 원문과 동일하게 유지하세요.
                         
-                        다음 형식으로 작성해주세요
-                        
-                        [문장 내 시간] 번역
-                        예시
-                        [00:03] 일찍이 저는 쿠르트  통 전 미국 APEC 대사이자 아시아 그룹의 매니징 파트너와 이야기를 나눴습니다.
-    
 
                         추가 지침:
                         - 번역문만 출력하세요.
@@ -1005,13 +1005,7 @@ def gemini_translate_text_im_japan(_model, result_eng_transcript, generation_con
                 2. 専門用語が含まれる場合、その分野で一般的に使用される正確な用語を使用してください。
                 3. 文化的な文脈を考慮して、適切な表現に変換してください。
                 4. 敬語や丁寧語のレベルを原文と同じにしてください。
-
-                「次の形式で書いてください」
-
-                [文中の時間] 翻訳
-                例え
-                [00:03] 以前、私は元アメリカAPEC大使であり、アジアグループのマネージングパートナーであるクルト・トング氏とお話ししました。
-
+                
                 追加指示:
                 - 翻訳文のみ出力してください。
                 - 説明や注釈を追加しないでください。
@@ -1063,12 +1057,6 @@ def gemini_translate_text_im_china(_model, result_eng_transcript, generation_con
                 2. 専門用語が含まれる場合、その分野で一般的に使用される正確な用語を使用してください。
                 3. 文化的な文脈を考慮して、適切な表現に変換してください。
                 4. 敬語や丁寧語のレベルを原文と同じにしてください。
-                
-                「请按照以下格式书写」
-                [句子中的时间] 翻译
-
-                例子
-                [00:03] 此前，我与前美国APEC大使、亚洲集团的管理合伙人库尔特·通先生进行了交谈。
                 
                 追加指示:
                 - 翻訳文のみ出力してください。
@@ -1122,13 +1110,6 @@ def gemini_translate_text_im_espanol(_model, result_eng_transcript, generation_c
                 2. Si contiene términos técnicos, utiliza el término correcto que se usa comúnmente en el campo correspondiente.
                 3. Considera el contexto cultural y conviértelo a una expresión adecuada.
                 4. Mantén el nivel de cortesía o formalidad igual al del texto original.
-
-                Por favor, escríbalo en el siguiente formato.
-
-                [Tiempo en la oración] Traducción
-
-                ejemplo
-                [00:03] Anteriormente, hablé con Kurt Tong, ex embajador de EE. UU. en APEC y socio gerente del Grupo Asia.
                 
                 Instrucciones adicionales:
                 - Solo muestra el texto traducido.
@@ -1149,7 +1130,7 @@ def gemini_translate_text_im_espanol(_model, result_eng_transcript, generation_c
     
     return translated_text
 @st.cache_data
-def gemini_translate_text_im_fran(_model, result_eng_transcript, generation_config): 
+def gemini_translate_text_im_fran(_model, result_eng_transcript, generation_config):
     """
     Divise le texte en parties de taille spécifique et génère la traduction pour chaque fragment.
     
@@ -1181,12 +1162,6 @@ def gemini_translate_text_im_fran(_model, result_eng_transcript, generation_conf
                 2. Si des termes techniques sont inclus, utilisez le terme correct couramment employé dans le domaine concerné.
                 3. Prenez en compte le contexte culturel et adaptez l'expression de manière appropriée.
                 4. Maintenez le même niveau de politesse ou de formalité que dans le texte original.
-
-                Veuillez l'écrire dans le format suivant
-                [Temps dans la phrase] Traduction
-
-                exemple
-                [00:03] Auparavant, j'ai parlé avec Kurt Tong, ancien ambassadeur des États-Unis auprès de l'APEC et partenaire directeur du Groupe Asie.
                 
                 Instructions supplémentaires :
                 - Affichez uniquement le texte traduit.
@@ -1217,9 +1192,9 @@ def create_settings_sidebar():
         # Gemini API 설정 섹션
         st.header("API Setting")
         api_key = st.text_input(
-            "Gemini API Key",
+            "Gemini API 키",
             type="password",
-            help="Please enter the Gemini API key issued from Google Cloud Console."
+            help="Google Cloud Console에서 발급받은 Gemini API 키를 입력하세요"
         )
          # API 키 발급 링크 버튼
         st.markdown("""
@@ -1274,6 +1249,28 @@ def create_settings_sidebar():
             value=11,
             step=1
         )
+        # 반환된 값 받기
+        
+                # 설정 적용 버튼
+        apply_settings = st.button("설정 적용")
+        
+        # CSS 스타일 적용
+        if apply_settings:
+            css = f"""
+                <style>
+                    .native-text {{
+                        font-family: "{native_font}", sans-serif;
+                        font-size: {font_size};
+                  
+                    }}
+                    .learn-text {{
+                        font-family: "{want_font}", sans-serif;
+                        font-size: {font_size};
+               
+                    }}
+                </style>
+            """
+            st.markdown(css, unsafe_allow_html=True)
         
         return {
             "api_key": api_key,
@@ -1296,9 +1293,13 @@ want_font = settings['want_font']
 font_size = settings['font_size']
 api_key = settings['api_key']
 
+
+
+#display_chat_message("assistant", type(api_key))
+# video_id가 None일 경우
 if video_id is None :
     display_chat_message("assistant", "Please check the URL address again.")
-    
+
 else:
     try:
         # transcript_list 초기화
@@ -1315,396 +1316,682 @@ else:
 
             try:
                 # 자막 언어 목록 가져오기
-                    display_chat_message("assistant", ai_response)
+                display_chat_message("assistant", ai_response)
     
-                #if want_language == "English":# 영어가 배우고 싶은 사람이 많을테니 힘을 썼다.
-                    
+                if want_language == "English":# 영어가 배우고 싶은 사람이 많을테니 힘을 썼다.
 
-                    if want_language == "English":
 
-                        want_lang_no_time = get_best_english_transcript_no_time(video_id)
-                        want_code_check = get_best_english_encode(video_id)
-                        want_lang_in_time = get_best_english_transcript(video_id)
-                       
-                        
-                    else:
-                        want_lang_no_time = get_best_want_no_time(video_id, learn_code)
-                        want_code_check  = get_best_learn_code(video_id , learn_code)
-                        want_lang_in_time= get_best_want_in_time(video_id,learn_code)
-                       
+
                     
-                    if want_code_check == None:
+                    
+                    en_code = get_best_english_encode(video_id)
+                    
+                    if en_code== None:
                         display_chat_message("assistant" , "There are no subtitles available. Please choose a different video.")
-                        
-
-                    else:                                     
-                           
-                            UporLow = contains_lowercase(want_lang_no_time)
-                            dot_Check = check_dot(want_lang_no_time)
-                        
-                            if dot_Check == False:
-                                if want_language  == "English":                                      
-                                    display_chat_message("assistant", "There are no delimiters detected. This service analyzes sentences based on delimiters such as (.) and (?). We’ll try a different way to separate the sentences, but this method might not be as precise.")
-                                else:
-                                    #display_chat_message("assistant", "There are no delimiters. This service analyzes sentences using delimiters such as (.) and (?). Please select a different video.")
-                                    st.warning("There are no delimiters. This service analyzes sentences using delimiters such as (.) and (?). Please select a different video.")
-                                    st.stop()
-                        
+                    
+                    else:
+                       
+            
+                                UporLow = contains_lowercase(eng_script_no_time)
+                                dot_Check = check_dot(eng_script_no_time)
                             
-                            
-                            import re 
-
-                            new_script = ""
-
-                            for start, read_script in want_lang_in_time:
-                                    minutes = int(start // 60)  # 분 계산 (소수점 없음)
-                                    seconds = int(start % 60)  # 초 계산 (소수점 없음)
-
-                                    if dot_Check == False and want_language  == "English": # 영어 일때만 문장 구분 
-                                        #display_chat_message("assistant", dot_Check)
-                                            # 문장 구분이 필요한 단어 리스트
-                                        keywords = ["I", "And", "But", "Now", "What", "How", "Have", "Did", "No", "In", 
-                                        "So", "Then", "Or", "Why", "Yes", "If", "When", "Because", 
-                                        "Well", "Oh", "Ah", "Okay", "Alright", 
-                                        "Therefore", "However", "Moreover", "Though", "Although"]
-                                        for word in keywords:
-                                            read_script  = read_script.replace(word , f".{word}")
+                                if dot_Check == False:
                                             
+                                            display_chat_message("assistant", "There are no delimiters detected. This service analyzes sentences based on delimiters such as (.) and (?). We’ll try a different way to separate the sentences, but this method might not be as precise. Thank you for your understanding! 😊")
                                 
-                                # 시간 형식 설정 (분.초 형태)
-                                    time_format = f"[{minutes:02d}:{seconds:02d}]"
-                                # . 기반이다 보니 문제가 있을 만한 것들을 수정    
-                                    read_script = read_script.replace('U.S.', 'US')
-                                    read_script = read_script.replace('U.S', 'US')
-                                    read_script = read_script.replace('S.E.C.' , 'SEC')
-                                    read_script = read_script.replace('Mr.', 'Mr ')
-                                    read_script = read_script.replace('Mrs.', 'Mrs ')
-
-                                    read_script = read_script.replace('Ph.D.', 'ph,D ')
-                                    read_script = read_script.replace('Prof.', 'prof ')
-                                    read_script = read_script.replace('Dr.', 'Dr ')
-
-                                    read_script = read_script.replace('No.', 'Number ')
-                                    
-                                    read_script = read_script.replace('a.m.', 'am')
-                                    read_script = read_script.replace('p.m.', 'pm')
-                                    
-                                    read_script = re.sub(r'(\d)\.(\d)', r'\1 point \2', read_script)
 
 
-                                    read_script = read_script.replace('..' , ".")
-                                    read_script = read_script.replace('..' , ".")
-                                    read_script = read_script.replace('..' , ".") 
-                                    #read_script = read_script.replace('. >>' , ".")
-
-                                    read_script = read_script.replace('\n', ' ')
-                                    read_script = read_script.replace('.', '. \n')
-                                    read_script = read_script.replace('?' , '? \n')
-                                    read_script = read_script.replace('。' , '。 \n')
-                                   
-                                    if UporLow  == False:
-                                            read_script = read_script[0].upper() + read_script[1:].lower()
-
-                                    new_script += ' '
-                                    new_script += time_format
-                                    new_script += read_script
-
+                            #else:
                                 
-                            result_want_transcript =  ["\n\n"]
 
-                            #to_timestamps_list = []
+                                eng_script_in_time = get_best_english_transcript(video_id)
+                                
+                                import re 
 
-                            # 타임스탬프 맨앞 빼고 제거 함수
-                            def clean_transcript_texts(transcript_texts):
-                                        cleaned_texts = ""
-                                        for text in transcript_texts:
-                                            # 첫 번째 타임스탬프만 남기고 나머지 타임스탬프를 제거
-                                            # 1) 모든 타임스탬프를 찾음
-                                            timestamps = re.findall(r'\[\d{2}:\d{2}\]', text)
-                                            
-                                            if timestamps:
-                                                # 2) 첫 번째 타임스탬프만 남기고  리스트에 to_time  에 넣어주었음 나중에 앞에 붙일거
-                                                first_timestamp = timestamps[0]
-                                                #to_timestamps_list.append(first_timestamp)
-                                                cleaned_text = text.replace(first_timestamp, '',1)
-                                                cleaned_text = re.sub(r'\[\d{2}:\d{2}\]','', cleaned_text)  # 나머지 타임스탬프 제거
-                                                cleaned_texts += first_timestamp +" "+ cleaned_text.strip() +" "
-                                            
-                                            else:
-                                                # 타임스탬프가 없는 경우
-                                                cleaned_texts += text.strip() +" "
+                                new_script = ""
 
-                                        return cleaned_texts.strip()  # 최종 문자열 반환
+                                for start, read_script in eng_script_in_time:
+                                        minutes = int(start // 60)  # 분 계산 (소수점 없음)
+                                        seconds = int(start % 60)  # 초 계산 (소수점 없음)
 
-                            result_want_script = new_script.splitlines()
+                                        if dot_Check == False:
+                                            #display_chat_message("assistant", dot_Check)
 
-                            for line in  result_want_script:
-                                    result_want_transcript.append("\n")
-                                    result_want_transcript.append(clean_transcript_texts([line]))
-                                    result_want_transcript.append("\n")    
-
-                            result_only_want_for_word = ["\n\n\n"]
-                            
-                            for line in  result_want_script:
-                                    
-                                    result_only_want_for_word.append(clean_transcript_texts([line]))
-                                    result_only_want_for_word.append("\n")
+                                             # 문장 구분이 필요한 단어 리스트
+                                            keywords = ["I", "And", "But", "Now", "What", "How", "Have", "Did", "No", "In", 
+                                            "So", "Then", "Or", "Why", "Yes", "If", "When", "Because", 
+                                            "Well", "Oh", "Ah", "Okay", "Alright", 
+                                            "Therefore", "However", "Moreover", "Though", "Although"]
+                                            for word in keywords:
+                                                read_script  = read_script.replace(word , f".{word}")
                                                
-                            
-                            word_file = create_word_file_shadow_script(result_only_want_for_word,title_video,learn_code,want_font,native_font,font_size)
-                            
 
-                            result_target_script =get_best_to_translate_target(video_id , native_code)
-                            new_target_script = ""
 
-                            for read_script_target_line in result_target_script:
                                     
-                                    read_script_target_line = read_script_target_line.replace('U.S.', 'US')
-                                    read_script_target_line = read_script_target_line.replace('U.S', 'US')
-                                    read_script_target_line = read_script_target_line.replace('S.E.C.' , 'SEC')
-                                    read_script_target_line = read_script_target_line.replace('Mr.', 'Mr ')
-                                    read_script_target_line = read_script_target_line.replace('Mrs.', 'Mrs ')
+                                    # 시간 형식 설정 (분.초 형태)
+                                        time_format = f"[{minutes:02d}:{seconds:02d}]"
+                                    # . 기반이다 보니 문제가 있을 만한 것들을 수정    
+                                        read_script = read_script.replace('U.S.', 'US')
+                                        read_script = read_script.replace('U.S', 'US')
+                                        read_script = read_script.replace('S.E.C.' , 'SEC')
+                                        read_script = read_script.replace('Mr.', 'Mr ')
+                                        read_script = read_script.replace('Mrs.', 'Mrs ')
 
-                                    read_script_target_line = read_script_target_line.replace('Ph.D.', 'ph,D ')
-                                    read_script_target_line = read_script_target_line.replace('Prof.', 'prof ')
-                                    read_script_target_line = read_script_target_line.replace('Dr.', 'Dr ')
+                                        read_script = read_script.replace('Ph.D.', 'ph,D ')
+                                        read_script = read_script.replace('Prof.', 'prof ')
+                                        read_script = read_script.replace('Dr.', 'Dr ')
 
-                                    read_script_target_line = read_script_target_line.replace('No.', 'Number')
-                                    read_script_target_line = read_script_target_line.replace('a.m.', 'am')
-                                    read_script_target_line= read_script_target_line.replace('p.m.', 'pm')
-
-                                    read_script_target_line = read_script_target_line.replace('\n', ' ')
-                                    read_script_target_line = read_script_target_line.replace('.', '. \n')
-                                    read_script_target_line = read_script_target_line.replace('。', '。 \n')
-                                    read_script_target_line = read_script_target_line.replace('?' , '? \n')
-                                    
-                                    
-                                    new_target_script +=' '
-                                    new_target_script += read_script_target_line
-                            
-                            
-                            kor_script_line = new_target_script.splitlines()
-
-                            #display_chat_message("assistant", result_target_script)
-                            
-                            import google.generativeai as genai
-                                                            
-                            try:
-                                genai.configure(api_key=api_key)
-                                model = genai.GenerativeModel("gemini-1.5-flash")
-                                generation_config = genai.types.GenerationConfig(
-                                    candidate_count=1,
-                                    stop_sequences=["x"],
-                                    temperature=0,
-                                )
-                            except Exception as e:
-                                print(f"An error occurred: {e}")
-                                # Add further actions like retrying or prompting for a valid API key.
-                                st.warning("Please check the Gemini API again.")
-                                st.stop()
-
-                            #언어 분석은 이렇게 가자 
-                            if native_code == "ja":
-                                    advanced_word = gemini_check_advanced_word_im_japan(model, result_want_transcript, generation_config)
-                            if native_code == "ko":
-                                advanced_word = gemini_check_advanced_word(model, result_want_transcript, generation_config)
-
-                            if native_code == "es":
-                                    advanced_word = gemini_check_advanced_word_im_espanol(model, result_want_transcript, generation_config)
-                            if native_code == "zh-Hans":
-                                    advanced_word = gemini_check_advanced_word_im_china(model, result_want_transcript, generation_config)
-
-                            if native_code == "fr":
-                                    advanced_word =gemini_check_advanced_word_im_fran(model, result_want_transcript, generation_config)
-                            
-                            adw_script = advanced_word.splitlines()    
-                            word_file_adw = create_word_file_shadow_script(adw_script ,title_video,learn_code,want_font,native_font,font_size)
-
-                            display_chat_message("assistant","I'm working hard on the analysis, but it might take some time. Please wait a moment!") 
-                            
-                            #display_chat_message("assistant", advanced_word)
-                            if native_code == "ja":
-                                gemini_transcript= gemini_translate_text_im_japan(model, result_want_transcript, generation_config)
-                            if native_code == "ko":
-                                gemini_transcript= gemini_translate_text(model, result_want_transcript, generation_config)
-
-                            if native_code == "es":
-                                    gemini_transcript= gemini_translate_text_im_espanol(model, result_want_transcript, generation_config)
-                            if native_code == "zh":
-                                    gemini_transcript= gemini_translate_text_im_china(model, result_want_transcript, generation_config)
-
-                            if native_code == "fr":
-                                    gemini_transcript= gemini_check_advanced_word_im_fran(model, result_want_transcript, generation_config)
-
-                            
-
-                            #원래는 문제가 있는 개별을 번역해주려했으나 가끔 오류가 발생 사용불가
-                            def translate_with_gemini(model, text, source_lang, target_lang):
-                                        """
-                                        Gemini를 사용하여 텍스트를 번역합니다.
+                                        read_script = read_script.replace('No.', 'No,')
                                         
-                                        매개변수:
-                                        model: Gemini 모델 인스턴스
-                                        text (str): 번역할 텍스트
-                                        source_lang (str): 원본 언어 (예: '한국어', '영어', '일본어')
-                                        target_lang (str): 목표 언어 (예: '영어', '한국어', '일본어')
-                                        generation_config: 모델의 생성 설정
-                                        max_retries (int): 최대 재시도 횟수
+                                        read_script = read_script.replace('a.m.', 'am')
+                                        read_script = read_script.replace('p.m.', 'pm')
                                         
-                                        반환:
-                                        str: 번역된 텍스트
-                                        """
-                                        attempt = 0
-                                        while attempt < 3:
-                                            try:
-                                                response = model.generate_content(
-                                                    f"""
-                                                    당신은 전문 번역가입니다. 다음 텍스트를 {source_lang}에서 {target_lang}으로 번역해주세요.
+                                        read_script = re.sub(r'(\d)\.(\d)', r'\1 point \2', read_script)
 
-                                                    원본 텍스트: "{text}"
 
-                                                    번역 시 다음 사항을 준수해주세요:
-                                                    1. 원문의 의미를 정확하게 전달하되, 자연스러운 표현을 사용하세요.
-                                                    2. 존댓말이나 격식체의 수준을 원문과 동일하게 유지하세요.
-                                                    3. 당신은 친절하고 정중하며 완벽하게 번역을 수행하는 번역가입니다. 
-                                                    
-                                                    번역문만 출력하세요.
-                                                    """,
-                                                    generation_config=generation_config
-                                                )
+                                        read_script = read_script.replace('..' , ".")
+                                        read_script = read_script.replace('..' , ".")
+                                        read_script = read_script.replace('..' , ".") 
+                                        #read_script = read_script.replace('. >>' , ".")
+
+                                        read_script = read_script.replace('\n', ' ')
+                                        read_script = read_script.replace('.', '. \n')
+                                        read_script = read_script.replace('?' , '? \n')
+                                        read_script = read_script.replace('。' , '。 \n')
+                                        #read_script = read_script.replace('>>' ,'\n >>')
+                                        if UporLow  == False:
+                                                read_script = read_script[0].upper() + read_script[1:].lower()
+
+                                        new_script += ' '
+                                        new_script += time_format
+                                        new_script += read_script
+
+                                 
+                                result_eng_transcript =  ["\n\n"]
+
+                                to_timestamps_list = []
+
+                                def clean_transcript_texts(transcript_texts):
+                                            cleaned_texts = ""
+                                            for text in transcript_texts:
+                                                # 첫 번째 타임스탬프만 남기고 나머지 타임스탬프를 제거
+                                                # 1) 모든 타임스탬프를 찾음
+                                                timestamps = re.findall(r'\[\d{2}:\d{2}\]', text)
                                                 
-                                                # 응답이 유효한지 확인
-                                                if hasattr(response, 'text') and response.text:
-                                                    return response.text
+                                                if timestamps:
+                                                    # 2) 첫 번째 타임스탬프만 남기고  리스트에 to_time  에 넣어주었음 나중에 앞에 붙일거
+                                                    first_timestamp = timestamps[0]
+                                                    to_timestamps_list.append(first_timestamp)
+                                                    cleaned_text = text.replace(first_timestamp, '',1)
+                                                    cleaned_text = re.sub(r'\[\d{2}:\d{2}\]','', cleaned_text)  # 나머지 타임스탬프 제거
+                                                    cleaned_texts += first_timestamp +" "+ cleaned_text.strip() +" "
+                                                
                                                 else:
-                                                    raise ValueError("유효하지 않은 응답입니다.")
-                                            
-                                            except Exception as e:
-                                                print(f"오류가 발생했습니다 (시도 {attempt + 1}/3): {e}")
-                                                attempt += 1
+                                                    # 타임스탬프가 없는 경우
+                                                    cleaned_texts += text.strip() +" "
 
-                                        # 최대 재시도 횟수 초과 시 None 반환
-                                        print("최대 재시도 횟수를 초과했습니다.")
-                                        return None
+                                            return cleaned_texts.strip()  # 최종 문자열 반환
 
-                            from sentence_transformers import SentenceTransformer  # 텍스트 백터 변환
-                            from sklearn.metrics.pairwise import cosine_similarity # 벡터 유사도 계산
-                            import numpy as np
+                                result_eng_script = new_script.splitlines()
 
-                            # 파일 읽기 리스트화 하였습니다
-                            
-                            english_lines = result_want_transcript
-
-                            gemini_lines = gemini_transcript.splitlines()  # splitlines()로 리스트 생성
-                            korean_lines = kor_script_line
-                            #display_chat_message("assistant",gemini_lines)
-                            # 문장 임베딩 모델 로드 (다국어 지원 모델 사용)
-                            #model_similarity = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
-                            # 파일 읽기 리스트화 하였습니다
-                            
-
-                            # 문장 임베딩 모델 로드 (다국어 지원 모델 사용)
-                            #model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
-                            model = SentenceTransformer('paraphrase-xlm-r-multilingual-v1')
-                            # 영어와 한글 문장의 임베딩 벡터 생성 # 임베딩 생성
-                            english_embeddings = model.encode(english_lines)
-                            korean_embeddings = model.encode(korean_lines)
-
-                            # 유사도 매트릭스 계산
-                            similarity_matrix = cosine_similarity(english_embeddings, korean_embeddings) 
-
-                            # 유사도가 가장 높은 문장끼리 매칭
-                            merged_lines = ["\n\n\n"]
-                            used_korean_indices = set() # 사용한 한국어는 지우기 위해 집합 사용
-
-                            for eng_idx, eng_sentence in enumerate(english_lines):
-                                # 각 영어 문장에 대해 가장 유사한 한글 문장을 찾음
-                                if not eng_sentence.strip():
-                                    continue
-
-                                time_judge = re.search(r"\[(\d{2}:\d{2})\]", eng_sentence)
-                                
-                                if time_judge:  # time_judge가 None이 아닐 때
-                                    time_str = time_judge.group(0) 
-
-                                
-                                    for j in range(len(gemini_lines)):
-                                            if time_str in gemini_lines[j]:  # time_str이 adw[j]에 있는지 확인
-                                                kor_sentence = gemini_lines[j]
-                                            else:
-                                                best_kor_idx = np.argmax(similarity_matrix[eng_idx])
-                                                best_kor_similarity = similarity_matrix[eng_idx, best_kor_idx]             
-
-                                                if best_kor_idx not in used_korean_indices:
-                                                                    
-                                                        kor_sentence = korean_lines[best_kor_idx]
-
-                                                used_korean_indices.add(best_kor_idx)
-                                    
-                                                kor_sentence = re.sub(r'\[\d{2}:\d{2}\]','', kor_sentence)
+                                for line in  result_eng_script:
+                                        result_eng_transcript.append("\n")
+                                        result_eng_transcript.append(clean_transcript_texts([line]))
+                                        result_eng_transcript.append("\n")    
+                                        
                                
-                                else:
-                                    best_kor_idx = np.argmax(similarity_matrix[eng_idx])
-                                    best_kor_similarity = similarity_matrix[eng_idx, best_kor_idx]             
+                                word_file = create_word_file_shadow_script(result_eng_transcript,title_video,learn_code,want_font,native_font,font_size)
+                               
+                                
+                                
+                                
+                                result_target_script =get_best_to_translate_target(video_id , native_code)
+                                new_target_script = ""
 
+                                for read_script_target_line in result_target_script:
+                                        
+                                        read_script_target_line = read_script_target_line.replace('U.S.', 'US')
+                                        read_script_target_line = read_script_target_line.replace('U.S', 'US')
+                                        read_script_target_line = read_script_target_line.replace('S.E.C.' , 'SEC')
+                                        read_script_target_line = read_script_target_line.replace('Mr.', 'Mr ')
+                                        read_script_target_line = read_script_target_line.replace('Mrs.', 'Mrs ')
+
+                                        read_script_target_line = read_script_target_line.replace('Ph.D.', 'ph,D ')
+                                        read_script_target_line = read_script_target_line.replace('Prof.', 'prof ')
+                                        read_script_target_line = read_script_target_line.replace('Dr.', 'Dr ')
+
+                                        read_script_target_line = read_script_target_line.replace('No.', 'Number')
+                                        read_script_target_line = read_script_target_line.replace('a.m.', 'am')
+                                        read_script_target_line= read_script_target_line.replace('p.m.', 'pm')
+
+                                        read_script_target_line = read_script_target_line.replace('\n', ' ')
+                                        read_script_target_line = read_script_target_line.replace('.', '. \n')
+                                        read_script_target_line = read_script_target_line.replace('。', '。 \n')
+                                        read_script_target_line = read_script_target_line.replace('?' , '? \n')
+                                        read_script_target_line  = read_script_target_line.replace('>>' ,'\n >>')
+                                        
+                                        new_target_script +=' '
+                                        new_target_script += read_script_target_line
+                                
+                                
+                                kor_script_line = new_target_script.splitlines()
+
+                                display_chat_message("assistant", result_target_script)
+                                
+                                import google.generativeai as genai
+                                
+                               
+                                try:
+                                    genai.configure(api_key=api_key)
+                                    model = genai.GenerativeModel("gemini-1.5-flash")
+                                    generation_config = genai.types.GenerationConfig(
+                                        candidate_count=1,
+                                        stop_sequences=["x"],
+                                        temperature=0,
+                                    )
+                                except Exception as e:
+                                    print(f"An error occurred: {e}")
+                                    # Add further actions like retrying or prompting for a valid API key.
+                                    st.warning("Please check the Gemini API again.")
+                                    st.stop()
+
+                                #언어 분석은 이렇게 가자 
+                                if native_code == "ja":
+                                     advanced_word = gemini_check_advanced_word_im_japan(model, result_eng_transcript, generation_config)
+                                if native_code == "ko":
+                                    advanced_word = gemini_check_advanced_word(model, result_eng_transcript, generation_config)
+
+                                if native_code == "es":
+                                     advanced_word = gemini_check_advanced_word_im_espanol(model, result_eng_transcript, generation_config)
+                                if native_code == "zh":
+                                     advanced_word = gemini_check_advanced_word_im_china(model, result_eng_transcript, generation_config)
+
+                                if native_code == "fr":
+                                     advanced_word =gemini_check_advanced_word_im_fran(model, result_eng_transcript, generation_config)
+
+                                adw_script = advanced_word.splitlines()    
+                                word_file_adw = create_word_file_shadow_script(adw_script ,title_video,learn_code,want_font,native_font,font_size)
+
+                                display_chat_message("assistant","I'm working hard on the analysis, but it might take some time. Please wait a moment!") 
+                                
+                                #display_chat_message("assistant", advanced_word)
+                                if native_code == "ja":
+                                    gemini_transcript= gemini_translate_text_im_japan(model, result_eng_transcript, generation_config)
+                                if native_code == "ko":
+                                    gemini_transcript= gemini_translate_text(model, result_eng_transcript, generation_config)
+
+                                if native_code == "es":
+                                     gemini_transcript= gemini_translate_text_im_espanol(model, result_eng_transcript, generation_config)
+                                if native_code == "zh":
+                                     gemini_transcript= gemini_translate_text_im_china(model, result_eng_transcript, generation_config)
+
+                                if native_code == "fr":
+                                     gemini_transcript= gemini_check_advanced_word_im_fran(model, result_eng_transcript, generation_config)
+
+
+                             
+
+                                #원래는 문제가 있는 개별을 번역해주려했으나 가끔 오류가 발생
+                                def translate_with_gemini(model, text, source_lang, target_lang):
+                                            """
+                                            Gemini를 사용하여 텍스트를 번역합니다.
+                                            
+                                            매개변수:
+                                            model: Gemini 모델 인스턴스
+                                            text (str): 번역할 텍스트
+                                            source_lang (str): 원본 언어 (예: '한국어', '영어', '일본어')
+                                            target_lang (str): 목표 언어 (예: '영어', '한국어', '일본어')
+                                            generation_config: 모델의 생성 설정
+                                            max_retries (int): 최대 재시도 횟수
+                                            
+                                            반환:
+                                            str: 번역된 텍스트
+                                            """
+                                            attempt = 0
+                                            while attempt < 3:
+                                                try:
+                                                    response = model.generate_content(
+                                                        f"""
+                                                        당신은 전문 번역가입니다. 다음 텍스트를 {source_lang}에서 {target_lang}으로 번역해주세요.
+
+                                                        원본 텍스트: "{text}"
+
+                                                        번역 시 다음 사항을 준수해주세요:
+                                                        1. 원문의 의미를 정확하게 전달하되, 자연스러운 표현을 사용하세요.
+                                                        2. 존댓말이나 격식체의 수준을 원문과 동일하게 유지하세요.
+                                                        3. 당신은 친절하고 정중하며 완벽하게 번역을 수행하는 번역가입니다. 
+                                                        
+                                                        번역문만 출력하세요.
+                                                        """,
+                                                        generation_config=generation_config
+                                                    )
+                                                    
+                                                    # 응답이 유효한지 확인
+                                                    if hasattr(response, 'text') and response.text:
+                                                        return response.text
+                                                    else:
+                                                        raise ValueError("유효하지 않은 응답입니다.")
+                                                
+                                                except Exception as e:
+                                                    print(f"오류가 발생했습니다 (시도 {attempt + 1}/3): {e}")
+                                                    attempt += 1
+
+                                            # 최대 재시도 횟수 초과 시 None 반환
+                                            print("최대 재시도 횟수를 초과했습니다.")
+                                            return None
+
+                                from sentence_transformers import SentenceTransformer  # 텍스트 백터 변환
+                                from sklearn.metrics.pairwise import cosine_similarity # 벡터 유사도 계산
+                                import numpy as np
+
+                                # 파일 읽기 리스트화 하였습니다
+                               
+                                english_lines = result_eng_transcript
+
+                                korean_lines = gemini_transcript.splitlines()  # splitlines()로 리스트 생성
+                                korean_lines += kor_script_line
+                                
+                                # 문장 임베딩 모델 로드 (다국어 지원 모델 사용)
+                                #model_similarity = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
+                                # 파일 읽기 리스트화 하였습니다
+                               
+
+                                # 문장 임베딩 모델 로드 (다국어 지원 모델 사용)
+                                #model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
+                                model = SentenceTransformer('paraphrase-xlm-r-multilingual-v1')
+                                # 영어와 한글 문장의 임베딩 벡터 생성 # 임베딩 생성
+                                english_embeddings = model.encode(english_lines)
+                                korean_embeddings = model.encode(korean_lines)
+
+                                # 유사도 매트릭스 계산
+                                similarity_matrix = cosine_similarity(english_embeddings, korean_embeddings) 
+
+                                # 유사도가 가장 높은 문장끼리 매칭
+                                merged_lines = []
+                                used_korean_indices = set() # 사용한 한국어는 지우기 위해 집합 사용
+
+                                for eng_idx, eng_sentence in enumerate(english_lines):
+                                    # 각 영어 문장에 대해 가장 유사한 한글 문장을 찾음
+                                    if eng_sentence == "\n":
+                                        continue
+                                
+                                    #eng_time_rm = re.sub(r'\[\d{2}:\d{2}\]','', eng_sentence) # [] 이거 때문에 번역 잘안나오는듯?
+                                
+                                    best_kor_idx = np.argmax(similarity_matrix[eng_idx])
+                                    best_kor_similarity = similarity_matrix[eng_idx, best_kor_idx]
+                                    
+                                    
+                                    # 이미 사용된 한글 문장이 아닐 경우에만 매칭 (중복 매칭 방지)
                                     if best_kor_idx not in used_korean_indices:
                                                         
                                             kor_sentence = korean_lines[best_kor_idx]
 
                                     used_korean_indices.add(best_kor_idx)
-                        
-                                    kor_sentence = re.sub(r'\[\d{2}:\d{2}\]','', kor_sentence)
-                    
                                     
-                                merged_lines.append(eng_sentence)
-                                merged_lines.append("\n\n")
-                                merged_lines.append(kor_sentence)
-                                
-                                if time_judge:  # time_judge가 None이 아닐 때
-                                    time_str = time_judge.group(0) 
-                                    for j in range(len(adw_script)):
-                                        if time_str in adw_script[j]:  # time_str이 adw[j]에 있는지 확인
-                                            merged_lines.append("\n")
-                                            merged_lines.append(adw_script[j].replace(time_str,""))
-                                                
-                                    merged_lines.append("\n\n")      
-                                else:
-                                    merged_lines.append("\n")
-                              
-                            merged_en_ko_script = "".join(merged_lines)
+                                    kor_sentence = re.sub(r'\[\d{2}:\d{2}\]','', kor_sentence)
+                                    # 매칭 결과 저장
+                                    #merged_lines.append(f"{eng_sentence}\n\n{kor_sentence}\n")
+                                    merged_lines.append(eng_sentence)
+                                    merged_lines.append("\n\n")
+                                    merged_lines.append(kor_sentence)
+                                    
+                                    time_judge = re.search(r"\[(\d{2}:\d{2})\]", eng_sentence)
 
+                                    if time_judge:  # time_judge가 None이 아닐 때
+                                        time_str = time_judge.group(0)  # 추출된 시간 문자열 저장
+                                    
+                                        for j in range(len(adw_script)):
+                                            if time_str in adw_script[j]:  # time_str이 adw[j]에 있는지 확인
+                                                merged_lines.append("\n")
+                                                merged_lines.append(adw_script[j].replace(time_str,""))
+                                                 
+                                        merged_lines.append("\n\n")      
+                                    else:
+                                        merged_lines.append("\n")
+                                    print(eng_sentence) 
+                                    print("\n")
+                                    print(kor_sentence)
+
+                                    #merged_lines.append(f"{eng_sentence}\n\n{kor_sentence}\n유사도: {best_kor_similarity:.2f}\n")
+                                merged_en_ko_script = "".join(merged_lines)
+
+                                   
+                                merged_en_ko_script_split = merged_en_ko_script.splitlines()
                                 
-                            merged_en_ko_script_split = merged_en_ko_script.splitlines()
-                                 
-                                        
-                            word_file_shadowing_script = create_word_file_shadow_script(merged_en_ko_script_split,title_video,learn_code,want_font,native_font,font_size)
-                                # 워드 파일 다운로드 버튼
-                            
-                            st.download_button(
-                                            label="Download Subtitles I Want to Learn.docx",
-                                            data=word_file,
-                                            file_name="Want_Learn_language.docx",
-                                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                            key="download_button_1"
-                                )
-                            st.download_button(
-                                            label="Download Advanced Language.docx",
-                                            data=word_file_adw,
-                                            file_name="Advanced Language.docx",
-                                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                            key="download_button_word_file_adw"
-                                )
-                            
-                            st.download_button(
-                                    label="Download Shadowing File_Analysis Version.docx",
-                                    data=word_file_shadowing_script ,
-                                    file_name="Shadowing File_Analysis.docx",
-                                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                    key="download_button_merged_shadowing_script"
-                                    )            
-                            display_chat_message("assistant","I've completed it! Expand your world!")
-                            st.balloons()
+
+                                            
+                                            
+                                word_file_shadowing_script = create_word_file_shadow_script(merged_en_ko_script_split,title_video,learn_code,want_font,native_font,font_size)
+                                    # 워드 파일 다운로드 버튼
+                                st.download_button(
+                                                label="Download Subtitles I Want to Learn.docx",
+                                                data=word_file,
+                                                file_name="Want_Learn_language.docx",
+                                                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                                key="download_button_1"
+                                    )
+                                st.download_button(
+                                                label="Download Advanced Language.docx",
+                                                data=word_file_adw,
+                                                file_name="Advanced Language.docx",
+                                                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                                key="download_button_word_file_adw"
+                                    )
+                                
+                                st.download_button(
+                                        label="Download Shadowing File_Analysis Version.docx",
+                                        data=word_file_shadowing_script ,
+                                        file_name="Shadowing File_Analysis.docx",
+                                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                        key="download_button_merged_shadowing_script"
+                                        )            
+                                display_chat_message("assistant","I've completed it! Expand your world!")
+                                st.balloons()
                 
+                else:
+                    want_lang_no_time = get_best_want_no_time(video_id, learn_code)
+                    want_code_check  = get_best_learn_code(video_id , learn_code)
+                    want_lang_in_time= get_best_want_in_time(video_id,learn_code)
+                    get_trans_target = get_best_to_translate_target(video_id,learn_code)
+                    
+                    if want_code_check == None:
+                        display_chat_message("assistant" , "There are no subtitles available. Please choose a different video.")
+                    
+                    else:
+                        
+                            UporLow = contains_lowercase(want_lang_no_time)
+                            dot_Check = check_dot(want_lang_no_time)
+                            
+                            if dot_Check == False:
+                                display_chat_message("assistant", "There are no delimiters available. This service divides and analyzes sentences using delimiters such as periods (.) and question marks (?). Please choose a different video.")
+
+                            else:
+                                                                
+                                import re 
+
+                                new_script = ""
+
+                                for start, read_script in want_lang_in_time:
+                                        minutes = int(start // 60)  # 분 계산 (소수점 없음)
+                                        seconds = int(start % 60)  # 초 계산 (소수점 없음)
+                                    
+                                    # 시간 형식 설정 (분.초 형태)
+                                        time_format = f"[{minutes:02d}:{seconds:02d}]"
+                                        
+                                        
+
+                                    # . 기반이다 보니 문제가 있을 만한 것들을 수정    
+                                        read_script = read_script.replace('U.S.', 'US')
+                                        read_script = read_script.replace('U.S', 'US')
+                                        read_script = read_script.replace('S.E.C.' , 'SEC')
+                                        read_script = read_script.replace('Mr.', 'Mr ')
+                                        read_script = read_script.replace('Mrs.', 'Mrs ')
+
+                                        read_script = read_script.replace('Ph.D.', 'ph,D ')
+                                        read_script = read_script.replace('Prof.', 'prof ')
+                                        read_script = read_script.replace('Dr.', 'Dr ')
+
+                                        read_script = read_script.replace('No.', 'No,')
+                                        
+                                        read_script = read_script.replace('a.m.', 'am')
+                                        read_script = read_script.replace('p.m.', 'pm')
+                                        
+                                        read_script = re.sub(r'(\d)\.(\d)', r'\1 point \2', read_script)
+
+
+                                        read_script = read_script.replace('..' , ".")
+                                        read_script = read_script.replace('..' , ".")
+                                        read_script = read_script.replace('..' , ".") 
+
+                                        read_script = read_script.replace('\n', ' ')
+                                        read_script = read_script.replace('.', '. \n')
+                                        read_script = read_script.replace('?' , '? \n')
+                                        read_script = read_script.replace('。' ,'。 \n')
+
+                                        if UporLow  == False:
+                                                read_script = read_script[0].upper() + read_script[1:].lower()
+
+                                        new_script += ' '
+                                        new_script += time_format
+                                        new_script += read_script
+
+                                 
+                                result_eng_transcript =  ["\n\n"]
+
+                                to_timestamps_list = []
+
+                                def clean_transcript_texts(transcript_texts):
+                                            cleaned_texts = ""
+                                            for text in transcript_texts:
+                                                # 첫 번째 타임스탬프만 남기고 나머지 타임스탬프를 제거
+                                                # 1) 모든 타임스탬프를 찾음
+                                                timestamps = re.findall(r'\[\d{2}:\d{2}\]', text)
+                                                
+                                                if timestamps:
+                                                    # 2) 첫 번째 타임스탬프만 남기고  리스트에 to_time  에 넣어주었음 나중에 앞에 붙일거
+                                                    first_timestamp = timestamps[0]
+                                                    to_timestamps_list.append(first_timestamp)
+                                                    cleaned_text = text.replace(first_timestamp, '',1)
+                                                    cleaned_text = re.sub(r'\[\d{2}:\d{2}\]','', cleaned_text)  # 나머지 타임스탬프 제거
+                                                    cleaned_texts += first_timestamp +" "+ cleaned_text.strip() +" "
+                                                
+                                                else:
+                                                    # 타임스탬프가 없는 경우
+                                                    cleaned_texts += text.strip() +" "
+
+                                            return cleaned_texts.strip()  # 최종 문자열 반환
+
+                                result_eng_script = new_script.splitlines()
+
+                                for line in  result_eng_script:
+                                        result_eng_transcript.append("\n")
+                                        result_eng_transcript.append(clean_transcript_texts([line]))
+                                        result_eng_transcript.append("\n")    
+                                        
+                                word_file = create_word_file_shadow_script(result_eng_transcript,title_video,learn_code,want_font,native_font,font_size)
+
+                             
+                                display_chat_message("assistant", "I'm working hard to create a study file for shadowing practice!")
+                                
+                                #여기까지가 영어 [숫자] 표기 해준거임**
+
+                                #자동완성으로 만든 한글말고 번역을 써주는 코드 
+                                
+                                result_target_script =get_trans_target
+                               
+                                new_target_script = ""
+
+                                for read_script_target_line in result_target_script:
+                                        
+                                        read_script_target_line = read_script_target_line.replace('U.S.', 'US')
+                                        read_script_target_line = read_script_target_line.replace('U.S', 'US')
+                                        read_script_target_line = read_script_target_line.replace('S.E.C.' , 'SEC')
+                                        read_script_target_line = read_script_target_line.replace('Mr.', 'Mr ')
+                                        read_script_target_line = read_script_target_line.replace('Mrs.', 'Mrs ')
+
+                                        read_script_target_line = read_script_target_line.replace('Ph.D.', 'ph,D ')
+                                        read_script_target_line = read_script_target_line.replace('Prof.', 'prof ')
+                                        read_script_target_line = read_script_target_line.replace('Dr.', 'Dr ')
+
+                                        read_script_target_line = read_script_target_line.replace('No.', 'Number')
+                                        read_script_target_line = read_script_target_line.replace('a.m.', 'am')
+                                        read_script_target_line= read_script_target_line.replace('p.m.', 'pm')
+
+                                        read_script_target_line = read_script_target_line.replace('\n', ' ')
+                                        read_script_target_line = read_script_target_line.replace('.', '. \n')
+                                        read_script_target_line = read_script_target_line.replace('?' , '? \n')
+                                        #read_script_target_line  = read_script_target_line.replace('>>' ,'\n >>')
+                                        
+                                        new_target_script +=' '
+                                        new_target_script += read_script_target_line
+                                
+                                
+                                kor_script_line = new_target_script.splitlines()
+                                #display_chat_message("assistance", kor_script_line)
+                                
+                               
+
+                                import google.generativeai as genai
+                                
+                                # Try to configure and handle errors
+                                try:
+                                    genai.configure(api_key=api_key)
+                                    model = genai.GenerativeModel("gemini-1.5-flash")
+                                    generation_config = genai.types.GenerationConfig(
+                                        candidate_count=1,
+                                        stop_sequences=["x"],
+                                        temperature=0,
+                                    )
+                                except Exception as e:
+                                    print(f"An error occurred: {e}")
+                                    # Add further actions like retrying or prompting for a valid API key.
+                                    st.warning("Please check the Gemini API again.")
+                                    st.stop()
+
+                                #언어 분석은 이렇게 가자 
+                                if native_code == "ja":
+                                    advanced_word = gemini_check_advanced_word_im_japan(model, result_eng_transcript, generation_config)
+                                if native_code == "ko":
+                                    advanced_word = gemini_check_advanced_word(model, result_eng_transcript, generation_config)
+
+                                if native_code == "es":
+                                     advanced_word = gemini_check_advanced_word_im_espanol(model, result_eng_transcript, generation_config)
+                                if native_code == "zh":
+                                     advanced_word = gemini_check_advanced_word_im_china(model, result_eng_transcript, generation_config)
+
+                                if native_code == "fr":
+                                     advanced_word =gemini_check_advanced_word_im_fran(model, result_eng_transcript, generation_config)
+
+                                adw_script = advanced_word.splitlines()    
+                                word_file_adw = create_word_file_shadow_script(adw_script ,title_video,learn_code,want_font,native_font,font_size)
+
+                                display_chat_message("assistant","I'm working hard on the analysis, but it might take some time. Please wait a moment!") 
+                                
+                                #display_chat_message("assistant", advanced_word)
+                                if native_code == "ja":
+                                    gemini_transcript= gemini_translate_text_im_japan(model, result_eng_transcript, generation_config)
+                                if native_code == "ko":
+                                    gemini_transcript= gemini_translate_text(model, result_eng_transcript, generation_config)
+
+                                if native_code == "es":
+                                     gemini_transcript= gemini_translate_text_im_espanol(model, result_eng_transcript, generation_config)
+                                if native_code == "zh":
+                                     gemini_transcript= gemini_translate_text_im_china(model, result_eng_transcript, generation_config)
+
+                                if native_code == "fr":
+                                     gemini_transcript= gemini_check_advanced_word_im_fran(model, result_eng_transcript, generation_config)
+
+
+            
+
+                                from sentence_transformers import SentenceTransformer  # 텍스트 백터 변환
+                                from sklearn.metrics.pairwise import cosine_similarity # 벡터 유사도 계산
+                                import numpy as np
+
+                                # 파일 읽기 리스트화 하였습니다
+                               
+                                english_lines = result_eng_transcript
+
+                                korean_lines = gemini_transcript.splitlines()  # splitlines()로 리스트 생성
+                                korean_lines += kor_script_line
+                                
+                                # 문장 임베딩 모델 로드 (다국어 지원 모델 사용)
+                                #model_similarity = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
+                                # 파일 읽기 리스트화 하였습니다
+                               
+
+                                # 문장 임베딩 모델 로드 (다국어 지원 모델 사용)
+                                #model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
+                                model = SentenceTransformer('paraphrase-xlm-r-multilingual-v1')
+                                # 영어와 한글 문장의 임베딩 벡터 생성 # 임베딩 생성
+                                english_embeddings = model.encode(english_lines)
+                                korean_embeddings = model.encode(korean_lines)
+
+                                # 유사도 매트릭스 계산
+                                similarity_matrix = cosine_similarity(english_embeddings, korean_embeddings) 
+
+                                # 유사도가 가장 높은 문장끼리 매칭
+                                merged_lines = []
+                                used_korean_indices = set() # 사용한 한국어는 지우기 위해 집합 사용
+
+                                for eng_idx, eng_sentence in enumerate(english_lines):
+                                    # 각 영어 문장에 대해 가장 유사한 한글 문장을 찾음
+                                    if eng_sentence == "\n":
+                                        continue
+                                
+                                    #eng_time_rm = re.sub(r'\[\d{2}:\d{2}\]','', eng_sentence) # [] 이거 때문에 번역 잘안나오는듯?
+                                
+                                    best_kor_idx = np.argmax(similarity_matrix[eng_idx])
+                                    best_kor_similarity = similarity_matrix[eng_idx, best_kor_idx]
+                                    
+                                    
+                                    # 이미 사용된 한글 문장이 아닐 경우에만 매칭 (중복 매칭 방지)
+                                    if best_kor_idx not in used_korean_indices:
+                                                        
+                                            kor_sentence = korean_lines[best_kor_idx]
+
+                                    used_korean_indices.add(best_kor_idx)
+                                    
+                                    kor_sentence = re.sub(r'\[\d{2}:\d{2}\]','', kor_sentence)
+                                    # 매칭 결과 저장
+                                    #merged_lines.append(f"{eng_sentence}\n\n{kor_sentence}\n")
+                                    merged_lines.append(eng_sentence)
+                                    merged_lines.append("\n\n")
+                                    merged_lines.append(kor_sentence)
+                                    
+                                    time_judge = re.search(r"\[(\d{2}:\d{2})\]", eng_sentence)
+
+                                    if time_judge:  # time_judge가 None이 아닐 때
+                                        time_str = time_judge.group(0)  # 추출된 시간 문자열 저장
+                                    
+                                        for j in range(len(adw_script)):
+                                            if time_str in adw_script[j]:  # time_str이 adw[j]에 있는지 확인
+                                                merged_lines.append("\n")
+                                                merged_lines.append(adw_script[j].replace(time_str,""))
+                                                 
+                                        merged_lines.append("\n\n")      
+                                    else:
+                                        merged_lines.append("\n")
+                                    print(eng_sentence) 
+                                    print("\n")
+                                    print(kor_sentence)
+
+                                    #merged_lines.append(f"{eng_sentence}\n\n{kor_sentence}\n유사도: {best_kor_similarity:.2f}\n")
+                                merged_en_ko_script = "".join(merged_lines)
+
+                                   
+                                merged_en_ko_script_split = merged_en_ko_script.splitlines()
+                                
+
+                                            
+                                                
+
+                                word_file_shadowing_script = create_word_file_shadow_script(merged_en_ko_script_split,title_video,learn_code,want_font,native_font,font_size)
+                                    # 워드 파일 다운로드 버튼
+                                st.download_button(
+                                                label="Download Subtitles I Want to Learn.docx",
+                                                data=word_file,
+                                                file_name="Want_Learn_language.docx",
+                                                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                                key="download_button_1"
+                                    )
+                                st.download_button(
+                                                label="Download Advanced Language.docx",
+                                                data=word_file_adw,
+                                                file_name="Advanced Language.docx",
+                                                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                                key="download_button_word_file_adw"
+                                    )
+                                
+                                st.download_button(
+                                        label="Download Shadowing File_Analysis Version.docx",
+                                        data=word_file_shadowing_script ,
+                                        file_name="Shadowing File_Analysis.docx",
+                                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                        key="download_button_merged_shadowing_script"
+                                        )            
+                                display_chat_message("assistant","I've completed it! Expand your world!")
+                                st.balloons()
 
 
             except Exception as e:
