@@ -2,8 +2,6 @@ import streamlit as st
 
 import yt_dlp
 
-
-
 def get_video_info(url):
     try:
         ydl_opts = {
@@ -35,7 +33,7 @@ def create_modern_ui():
         Transform your favorite YouTube videos into powerful learning materials.
         """)
         
-        # 구분��� 추가
+        # 구분 추가
         st.divider()
     
     # 언어 선택 섹션 - 2개의 컬럼으로 구성
@@ -65,6 +63,8 @@ def create_modern_ui():
         - Target Language: {target_language} (code: {get_language_code(target_language)})
         """)
     
+   
+
     # URL 입력 섹션
     st.markdown("### 🎥 YouTube Video")
     url = st.text_input(
@@ -118,6 +118,11 @@ def get_language_code(language):
     }
     return codes.get(language, "unknown")
 
+st.set_page_config(
+    page_title="ShadowTube",
+    page_icon="▶️",
+    layout="wide"
+)
 # 스타일링
 st.markdown("""
     <style>
@@ -1605,10 +1610,10 @@ else:
 
                             # 문장 임베딩 모델 로드 (다국어 지원 모델 사용)
                             #model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
-                            model = SentenceTransformer('paraphrase-xlm-r-multilingual-v1')
+                            model_simul = SentenceTransformer('paraphrase-xlm-r-multilingual-v1')
                             # 영어와 한글 문장의 임베딩 벡터 생성 # 임베딩 생성
-                            english_embeddings = model.encode(english_lines)
-                            korean_embeddings = model.encode(korean_lines)
+                            english_embeddings = model_simul .encode(english_lines)
+                            korean_embeddings = model_simul .encode(korean_lines)
 
                             # 유사도 매트릭스 계산
                             similarity_matrix = cosine_similarity(english_embeddings, korean_embeddings) 
@@ -1702,7 +1707,8 @@ else:
                                     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                                     key="download_button_merged_shadowing_script"
                                     )            
-                            display_chat_message("assistant","I've completed it! Expand your world!")
+                            st.success("I've completed it! Expand your world!", icon="✅")
+                            #display_chat_message("assistant","I've completed it! Expand your world!")
                             st.balloons()
                 
 
