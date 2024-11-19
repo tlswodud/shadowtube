@@ -24,7 +24,7 @@ def get_video_info(url):
     
 def create_modern_ui():
     # 헤더 섹션
-    st.title("🎯 Shadowing YouTube Subtitle Generator")
+    st.title("🎯 Shadowing YouTube Subtitle Generator!")
     
     # 소개 섹션
     with st.container():
