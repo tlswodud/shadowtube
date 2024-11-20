@@ -1610,7 +1610,8 @@ else:
 
                             # 문장 임베딩 모델 로드 (다국어 지원 모델 사용)
                             #model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
-                            model_simul = SentenceTransformer('paraphrase-xlm-r-multilingual-v1')
+                            #model_simul = SentenceTransformer('paraphrase-xlm-r-multilingual-v1')
+                            model_simul= SentenceTransformer('./path_to_save_model')
                             # 영어와 한글 문장의 임베딩 벡터 생성 # 임베딩 생성
                             english_embeddings = model_simul .encode(english_lines)
                             korean_embeddings = model_simul .encode(korean_lines)
