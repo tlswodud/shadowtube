@@ -12,10 +12,8 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt --root-user-action=ignore
 
-# 모델 다운로드 및 저장
-RUN python -c "\
-    from sentence_transformers import SentenceTransformer; \
-    SentenceTransformer('paraphrase-xlm-r-multilingual-v1').save('/app/paraphrase-xlm-r-multilingual-v1')"
+# 모델 다운로드 및 저장 (들여쓰기를 제거한 한 줄 코드로 수정)
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('paraphrase-xlm-r-multilingual-v1').save('/app/paraphrase-xlm-r-multilingual-v1')"
 
 # 포트 설정
 EXPOSE 8080
