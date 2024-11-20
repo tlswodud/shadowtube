@@ -9,3 +9,4 @@ sentence_transformers
 streamlit
 youtube_transcript_api
 yt_dlp
+google-generativeai
