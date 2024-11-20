@@ -12,6 +12,11 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt --root-user-action=ignore
 
+# 모델 다운로드 스크립트 복사
+COPY model_download.py /app/model_download.py
+
+# 모델 다운로드 실행
+RUN python /app/model_download.py
 
 # 포트 설정
 EXPOSE 8080

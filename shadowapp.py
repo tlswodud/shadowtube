@@ -202,7 +202,7 @@ from docx.shared import Pt
 from io import BytesIO
 from lxml import etree
 from docx.oxml import OxmlElement
-
+from youtube_transcript_api import VideoUnavailable
 
 
 def create_word_file_shadow_script(content, utb_title, learn_code, want_font, native_font, font_size): 
@@ -660,7 +660,7 @@ def get_best_learn_code(video_id , learn_code):
 user_input= url
 video_id = get_video_id(user_input)
 
-title_video = get_video_title(video_id)
+#title_video = get_video_title(video_id)
 
 
 
@@ -1307,7 +1307,7 @@ if video_id is None :
 else:
     try:
         # transcript_list 초기화
-        
+        title_video = get_video_title(video_id)
         transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
         
         # 채팅 처리
@@ -1715,8 +1715,8 @@ else:
 
             except Exception as e:
                 # list_available_languages에서 에러가 발생하면 처리
-                display_chat_message("assistant", f"An error occurred while loading the subtitle language list:{e}")
+                st.warning("YouTube subtitles access is restricted. Please choose another video.")
     except Exception as e:
         # transcript_list 초기화에서 에러가 발생하면 처리
-        display_chat_message("assistant", f"An error occurred while loading the subtitle language list:{e}")
+         st.warning("YouTube subtitles access is restricted. Please choose another video.")
 
