@@ -1,5 +1,5 @@
 import streamlit as st
-##en-core-web-sm==3.8.0
+
 import yt_dlp
 
 def get_video_info(url):
