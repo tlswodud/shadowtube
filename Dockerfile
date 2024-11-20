@@ -1,23 +1,9 @@
-# For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3-slim
-
-# Keeps Python from generating .pyc files in the container
-ENV PYTHONDONTWRITEBYTECODE=1
-
-# Turns off buffering for easier container logging
-ENV PYTHONUNBUFFERED=1
-
-# Install pip requirements
-COPY requirements.txt .
-RUN python -m pip install -r requirements.txt
-
+FROM python:3.7
 WORKDIR /app
+COPY requirements.txt ./requirements.txt # 설치 필요한 라이브러리
+COPY PatientInfo.csv ./PatientInfo.csv # 사용되는 데이터셋
+COPY Region.csv ./Region.csv # 사용되는 데이터셋
+RUN pip3 install -r requirements.txt
+EXPOSE 8080
 COPY . /app
-
-# Creates a non-root user with an explicit UID and adds permission to access the /app folder
-# For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
-RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
-USER appuser
-
-# During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD ["python", "Learn_language_utb\shadowapp.py"]
+CMD streamlit run --server.port 8080 --server.enableCORS false shadowapp.py
