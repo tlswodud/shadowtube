@@ -1609,12 +1609,14 @@ else:
                             
 
                             # 문장 임베딩 모델 로드 (다국어 지원 모델 사용)
-                            #model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
+                            #model_simul = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
                             #model_simul = SentenceTransformer('paraphrase-xlm-r-multilingual-v1')
-                            model_simul= SentenceTransformer('./path_to_save_model')
+                            #model_simul= SentenceTransformer('./path_to_save_model')
                             # 영어와 한글 문장의 임베딩 벡터 생성 # 임베딩 생성
-                            english_embeddings = model_simul .encode(english_lines)
-                            korean_embeddings = model_simul .encode(korean_lines)
+                            # 문장 임베딩 모델 로드 (도커 컨테이너 내부 경로에서 로드)
+                            model_simul = SentenceTransformer('/app/model/sentence_transformer')
+                            english_embeddings = model_simul.encode(english_lines)
+                            korean_embeddings = model_simul.encode(korean_lines)
 
                             # 유사도 매트릭스 계산
                             similarity_matrix = cosine_similarity(english_embeddings, korean_embeddings) 
