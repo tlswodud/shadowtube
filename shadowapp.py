@@ -24,17 +24,42 @@ def get_video_info(url):
     
 def create_modern_ui():
     # 헤더 섹션
-    st.title("🎯 Shadowing YouTube Subtitle Generator!")
+    st.markdown("""
+        <div style='text-align: center; padding: 2rem 0;'>
+            <h1 style='color: #1E88E5;'>▶️ ShadowTube</h1>
+            <p style='font-size: 1.2rem; color: #424242;'>AI Shadowing Script Generator</p>
+        </div>
+    """, unsafe_allow_html=True)
     
-    # 소개 섹션
-    with st.container():
-        st.markdown("""
-        ### 🚀 Learn Languages Through YouTube!
-        Transform your favorite YouTube videos into powerful learning materials.
-        """)
-        
-        # 구분 추가
-        st.divider()
+    # 소개 섹션 - 카드 스타일 디자인
+    st.markdown("""
+        <div style='background-color: #F8F9FA; padding: 2rem; border-radius: 10px; margin: 1rem 0;'>
+            <h3 style='color: black;'>🚀 Learn Languages Through YouTube!</h3>
+            <p style='font-size: 1.1rem; color: #424242;'>
+                Easily transform your favorite YouTube videos into powerful learning materials!
+            </p>
+            <div style='display: flex; gap: 1rem; margin-top: 1rem;'>
+                <div style='background: #E3F2FD; padding: 1rem; border-radius: 8px; flex: 1;'>
+                    <h4>✨ Features</h4>
+                    <ul style='margin: 0;'>
+                        <li>Translations</li>
+                        <li>Vocabulary analysis</li>
+                        <li>Shadowing scripts</li>
+                    </ul>
+                </div>
+                <div style='background: #E8F5E9; padding: 1rem; border-radius: 8px; flex: 1;'>
+                    <h4>📚 Benefits</h4>
+                    <ul style='margin: 0;'>
+                        <li>Learn from your favorite content.</li>
+                        <li>Natural pronunciation</li>
+                        <li>Contextual learning</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    st.divider()
     
     # 언어 선택 섹션 - 2개의 컬럼으로 구성
     col1, col2 = st.columns(2)
@@ -121,7 +146,7 @@ def get_language_code(language):
 st.set_page_config(
     page_title="ShadowTube",
     page_icon="▶️",
-    layout="wide"
+    layout="centered"
 )
 # 스타일링
 st.markdown("""
@@ -1316,7 +1341,7 @@ else:
             display_chat_message("user", user_input)
 
             # AI 응답 (예시)
-            ai_response = f"We are processing the message you entered: '**{user_input}**'."
+            ai_response = "Checking your video... Bot is running!"
 
             try:
                 # 자막 언어 목록 가져오기
@@ -1418,6 +1443,7 @@ else:
                             result_want_transcript =  ["\n\n"]
 
                             #to_timestamps_list = []
+                          
 
                             # 타임스탬프 맨앞 빼고 제거 함수
                             def clean_transcript_texts(transcript_texts):
@@ -1508,6 +1534,7 @@ else:
                                 st.warning("Please check the Gemini API again.")
                                 st.stop()
 
+                            display_chat_message("assistant","I'm working hard on the analysis, but it might take some time. Please wait a moment!") 
                             #언어 분석은 이렇게 가자 
                             if native_code == "ja":
                                     advanced_word = gemini_check_advanced_word_im_japan(model, result_want_transcript, generation_config)
@@ -1525,8 +1552,8 @@ else:
                             adw_script = advanced_word.splitlines()    
                             word_file_adw = create_word_file_shadow_script(adw_script ,title_video,learn_code,want_font,native_font,font_size)
 
-                            display_chat_message("assistant","I'm working hard on the analysis, but it might take some time. Please wait a moment!") 
-                            
+                           
+                            display_chat_message("assistant","Almost there! Just a few more moments..") 
                             #display_chat_message("assistant", advanced_word)
                             if native_code == "ja":
                                 gemini_transcript= gemini_translate_text_im_japan(model, result_want_transcript, generation_config)
@@ -1591,7 +1618,9 @@ else:
                                         # 최대 재시도 횟수 초과 시 None 반환
                                         print("최대 재시도 횟수를 초과했습니다.")
                                         return None
-
+                            
+                            
+                            
                             from sentence_transformers import SentenceTransformer  # 텍스트 백터 변환
                             from sklearn.metrics.pairwise import cosine_similarity # 벡터 유사도 계산
                             import numpy as np
@@ -1689,14 +1718,14 @@ else:
                                 # 워드 파일 다운로드 버튼
                             
                             st.download_button(
-                                            label="Download Subtitles I Want to Learn.docx",
+                                            label="📄 Download Subtitles I Want to Learn.docx",
                                             data=word_file,
                                             file_name="Want_Learn_language.docx",
                                             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                                             key="download_button_1"
                                 )
                             st.download_button(
-                                            label="Download Advanced Language.docx",
+                                            label="📄 Download Advanced Language.docx",
                                             data=word_file_adw,
                                             file_name="Advanced Language.docx",
                                             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -1704,7 +1733,7 @@ else:
                                 )
                             
                             st.download_button(
-                                    label="Download Shadowing File_Analysis Version.docx",
+                                    label="📄 Download Shadowing File_Analysis Version.docx",
                                     data=word_file_shadowing_script ,
                                     file_name="Shadowing File_Analysis.docx",
                                     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
