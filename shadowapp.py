@@ -1639,11 +1639,11 @@ else:
 
                             # 문장 임베딩 모델 로드 (다국어 지원 모델 사용)
                             #model_simul = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
-                            #model_simul = SentenceTransformer('paraphrase-xlm-r-multilingual-v1')
+                            model_simul = SentenceTransformer('paraphrase-xlm-r-multilingual-v1')
                             #model_simul= SentenceTransformer('./path_to_save_model')
                             # 영어와 한글 문장의 임베딩 벡터 생성 # 임베딩 생성
                             # 문장 임베딩 모델 로드 (도커 컨테이너 내부 경로에서 로드)
-                            model_simul = SentenceTransformer('/app/model/sentence_transformer')
+                            #model_simul = SentenceTransformer('/app/model/sentence_transformer')
                             english_embeddings = model_simul.encode(english_lines)
                             korean_embeddings = model_simul.encode(korean_lines)
 
@@ -1747,8 +1747,8 @@ else:
 
             except Exception as e:
                 # list_available_languages에서 에러가 발생하면 처리
-                st.warning("YouTube subtitles access is restricted. Please choose another video.")
+                st.warning(f"YouTube subtitles access is restricted. Please choose another video.{e}")
     except Exception as e:
         # transcript_list 초기화에서 에러가 발생하면 처리
-         st.warning("YouTube subtitles access is restricted. Please choose another video.")
+         st.warning(f"YouTube subtitles access is restricted. Please choose another video.{e}")
 
