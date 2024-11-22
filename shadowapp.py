@@ -29,9 +29,16 @@ def get_video_info(url):
 def create_modern_ui():
     # 헤더 섹션
     st.markdown("""
+    <head>
+        <meta name="google-adsense-account" content="ca-pub-4095011834932682">
+    </head>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4095011834932682"
      crossorigin="anonymous"></script>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
+
     
     st.markdown("""
         <div style='text-align: center; padding: 2rem 0;'>
@@ -1263,6 +1270,8 @@ want_font = settings['want_font']
 font_size = settings['font_size']
 api_key = settings['api_key']
 
+
+
 if video_id is None :
     display_chat_message("assistant", "Please check the URL address again.")
     
@@ -1270,7 +1279,13 @@ else:
     try:
         # transcript_list 초기화
         title_video = get_video_title(video_id)
-        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        try:
+            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        except:
+            display_chat_message("google Ban this service...Really?")
+
+        # transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        print("api_work")
         
         # 채팅 처리
         if user_input:
