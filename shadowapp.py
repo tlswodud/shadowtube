@@ -7,7 +7,9 @@ def get_video_info(url):
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
-            'extract_flat': True
+            'extract_flat': True,
+            'skip_download': True,  # 다운로드 건너뛰기
+            'prefer_ffmpeg': False
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
