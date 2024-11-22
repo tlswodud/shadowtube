@@ -2,38 +2,12 @@ import streamlit as st
 
 import yt_dlp
 
-# def get_video_info(url):
-#     try:
-#         ydl_opts = {
-#             'quiet': True,
-#             'no_warnings': True,
-#             'extract_flat': True
-#         }
-#         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-#             info = ydl.extract_info(url, download=False)
-#             return {
-#                 'title': info.get('title'),
-#                 'channel': info.get('uploader'),
-#                 'thumbnail': info.get('thumbnail'),
-#                 'duration': info.get('duration'),
-#                 'view_count': info.get('view_count')
-#             }
-#     except Exception as e:
-#         st.error(f"비디오 정보를 가져오는데 실패했습니다: {str(e)}")
-#         return None
-
 def get_video_info(url):
     try:
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
-            'extract_flat': True,
-            'no_check_certificate': True,
-            'ignoreerrors': True,
-            'no_warnings': True,
-            # ffmpeg 관련 옵션 추가
-            'prefer_ffmpeg': False,  # ffmpeg 사용 비활성화
-            'postprocessors': []     # 후처리 비활성화
+            'extract_flat': True
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
@@ -47,6 +21,7 @@ def get_video_info(url):
     except Exception as e:
         st.error(f"비디오 정보를 가져오는데 실패했습니다: {str(e)}")
         return None
+
 
     
 def create_modern_ui():

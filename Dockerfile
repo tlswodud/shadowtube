@@ -19,6 +19,11 @@ RUN mkdir -p /app/model && chmod 777 /app/model
 COPY model_download.py /app/model_download.py
 RUN python /app/model_download.py
 
+RUN apt-get update && \
+    apt-get install -y ffmpeg && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 # 포트 설정
 EXPOSE 8080
 
