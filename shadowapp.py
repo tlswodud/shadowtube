@@ -221,13 +221,13 @@ from urllib.parse import urlparse, parse_qs
 import yt_dlp
 from youtube_transcript_api import YouTubeTranscriptApi
 
-from langdetect import detect
+
 from docx import Document
 from docx.shared import Pt
 from io import BytesIO
-from lxml import etree
+
 from docx.oxml import OxmlElement
-from youtube_transcript_api import VideoUnavailable
+
 
 
 def create_word_file_shadow_script(content, utb_title, learn_code, want_font, native_font, font_size): 
