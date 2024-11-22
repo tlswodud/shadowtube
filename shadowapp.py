@@ -236,6 +236,8 @@ import os
 for key, value in os.environ.items():
     print(f"{key}: {value}")
 
+
+
 def create_word_file_shadow_script(content, utb_title, learn_code, want_font, native_font, font_size): 
     """
     각 언어에 맞는 폰트를 설정하여 워드 파일 생성
@@ -314,17 +316,17 @@ def create_word_file_shadow_script(content, utb_title, learn_code, want_font, na
 # 사용자 입력
 import streamlit as st
 @st.cache_data
-def get_best_english_transcript(video_id):
+def get_best_english_transcript(video_id,_transcript_list):
         # 선호하는 영어 자막 코드 목록
         english_codes = ['en-US', 'en-GB', 'en-CA', 'en-AU', 'en', 'a.en']
         
         try:
-            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+            #transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
             
             # 1. 먼저 수동 생성된 영어 자막 찾기 (모든 영어 변형 시도)
             try:
                 
-                transcript = transcript_list.find_manually_created_transcript(english_codes)
+                transcript = _transcript_list.find_manually_created_transcript(english_codes)
                 print(f"수동 생성된 영어 자막을 찾았습니다. (언어 코드: {transcript.language_code})")
                 result = [(entry['start'], entry['text']) for entry in transcript.fetch()]
                 return result
@@ -332,7 +334,7 @@ def get_best_english_transcript(video_id):
             except:
                 # 2. 수동 자막이 없을 경우, 자동 생성된 영어 자막 찾기
                 try:
-                    transcript = transcript_list.find_generated_transcript(english_codes)
+                    transcript = _transcript_list.find_generated_transcript(english_codes)
                     print(f"자동 생성된 영어 자막을 찾았습니다. (언어 코드: {transcript.language_code})")
                     result = [(entry['start'], entry['text']) for entry in transcript.fetch()]
                     return result
@@ -353,31 +355,31 @@ def get_best_english_transcript(video_id):
             print(f"자막을 가져오는 중 오류가 발생했습니다: {str(e)}")
             return None
 @st.cache_data        
-def get_best_english_encode(video_id):
+def get_best_english_encode(video_id,_transcript_list):
         
 
         # 선호하는 영어 자막 코드 목록
         english_codes = ['en-US', 'en-GB', 'en-CA', 'en-AU', 'en', 'a.en']
         
         try:
-            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+            #transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
             
             # 1. 먼저 수동 생성된 영어 자막 찾기 (모든 영어 변형 시도)
             try:
-                transcript = transcript_list.find_manually_created_transcript(english_codes)
+                transcript = _transcript_list.find_manually_created_transcript(english_codes)
                 print(f"수동 생성된 영어 자막을 찾았습니다. (언어 코드: {transcript.language_code})")
                 return english_codes
                 
             except:
                 # 2. 수동 자막이 없을 경우, 자동 생성된 영어 자막 찾기
                 try:
-                    transcript = transcript_list.find_generated_transcript(english_codes)
+                    transcript = _transcript_list.find_generated_transcript(english_codes)
                     print(f"자동 생성된 영어 자막을 찾았습니다. (언어 코드: {transcript.language_code})")
                     return english_codes
                     
                 except:
                     # 3. 마지막으로 'en'으로 시작하는 모든 코드 확인
-                    available_transcripts = list(transcript_list)
+                    available_transcripts = list(_transcript_list)
                     for transcript in available_transcripts:
                         if transcript.language_code.startswith('en'):
                             print(f"영어 자막을 찾았습니다. (언어 코드: {transcript.language_code})")
@@ -389,19 +391,20 @@ def get_best_english_encode(video_id):
         except Exception as e:
             print(f"자막을 가져오는 중 오류가 발생했습니다: {str(e)}")
             return None
+        
 #fetch 아 힘들다..
 @st.cache_data
-def get_best_english_transcript_no_time(video_id):
+def get_best_english_transcript_no_time(video_id,_transcript_list):
         # 선호하는 영어 자막 코드 목록
-        english_codes = ['en-US', 'en-GB', 'en-CA', 'en-AU', 'en', 'a.en']
+            english_codes = ['en-US', 'en-GB', 'en-CA', 'en-AU', 'en', 'a.en']
         
-        try:
-            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        #try:
+            #transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
             
             # 1. 먼저 수동 생성된 영어 ��막 찾기 (모든 영어 변형 시도)
             try:
                 
-                transcript = transcript_list.find_manually_created_transcript(english_codes)
+                transcript = _transcript_list.find_manually_created_transcript(english_codes)
                 print(f"수동 생성된 영어 자막을 찾았습니다. (언어 코드: {transcript.language_code})")
                 result = [(entry['text']) for entry in transcript.fetch()]
                 return result
@@ -409,14 +412,14 @@ def get_best_english_transcript_no_time(video_id):
             except:
                 # 2. 수동 자막이 없을 경우, 자동 생성된 영어 자막 찾기
                 try:
-                    transcript = transcript_list.find_generated_transcript(english_codes)
+                    transcript = _transcript_list.find_generated_transcript(english_codes)
                     print(f"자동 생성된 영어 자막을 찾았습니다. (언어 코드: {transcript.language_code})")
                     result = [(entry['text']) for entry in transcript.fetch()]
                     return result
                     
                 except:
                     # 3. 마지막으로 'en'으로 시작하는 모든 코드 확인
-                    available_transcripts = list(transcript_list)
+                    available_transcripts = list(_transcript_list)
                     for transcript in available_transcripts:
                         if transcript.language_code.startswith('en'):
                             print(f"영어 자막을 찾았습니다. (언어 코드: {transcript.language_code})")
@@ -426,84 +429,10 @@ def get_best_english_transcript_no_time(video_id):
                     print("영어 자막을 찾을 수 없습니다.")
                     return None
                     
-        except Exception as e:
-            print(f"자막을 가져오는 중 오류가 발생했습니다: {str(e)}")
-            return None
-def get_best_english_trans_Ko(video_id):
-    
-        try:
-            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-            english_codes = get_best_english_encode(video_id)
-            
-            # 1. 먼저 수동 생성된 영어 자막 찾기 (모든 영어 변형 시도)
-            try:
-                transcript = transcript_list.find_manually_created_transcript(english_codes)
-                print(f"수동 생성된 영어 자막을 찾았습니다. (언어 코드: {transcript.language_code})")
-                result = [(entry['text']) for entry in transcript.translate('ko').fetch()]
-                return result
-            
-            except:
-                # 2. 수동 자막이 없을 경우, 자동 생성된 영어 자막 찾기
-                try:
-                    transcript = transcript_list.find_generated_transcript(english_codes)
-                    print(f"자동 생성된 영어 자막을 찾았습니다. (언어 코드: {transcript.language_code})")
-                    result = [(entry['text']) for entry in transcript.translate('ko').fetch()]
-                    return result
-                    
-                except:
-                    # 3. 마지막으로 'en'으로 시작하는 모든 코드 확인
-                    available_transcripts = list(transcript_list)
-                    for transcript in available_transcripts:
-                        if transcript.language_code.startswith('en'):
-                            print(f"영어 자막을 찾았습니다. (언어 코드: {transcript.language_code})")
-                        result = [(entry['text']) for entry in transcript.translate('ko').fetch()]
-                        return result
-                    
-                    print("한글 자막을 찾을 수 없습니다.")
-                    return None
-                    
-        except Exception as e:
-            print(f"자막을 가져오는 중 오류가 발생했습니다: {str(e)}")
-            return None
-@st.cache_data
-def get_best_ko_transcript_no_time(video_id):
-        # 선호하는 영어 자막 코드 목록
-        ko_codes = ['ko' , 'a.ko']
-        
-        try:
-            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-            
-            # 1. 먼저 수동 생성된 영어 자막 찾기 (모든 영어 변형 시도)
-            try:
-                
-                transcript = transcript_list.find_manually_created_transcript(ko_codes)
-                print(f"수동 생성된 영어 자막을 찾았습니다. (언어 코드: {transcript.language_code})")
-                result = [(entry['text']) for entry in transcript.fetch()]
-                return result
-            
-            except:
-                # 2. 수동 자막이 없을 경우, 자동 생성된 영어 자막 찾기
-                try:
-                    transcript = transcript_list.find_generated_transcript(ko_codes)
-                    print(f"자동 생성된 영어 자막을 찾았습니다. (언어 코드: {transcript.language_code})")
-                    result = [(entry['text']) for entry in transcript.fetch()]
-                    return result
-                    
-                except:
-                    # 3. 마지막으로 'en'으로 시작하는 모든 코드 확인
-                    available_transcripts = list(transcript_list)
-                    for transcript in available_transcripts:
-                        if transcript.language_code.startswith('ko'):
-                            print(f"영어 자막을 찾았습니다. (언어 코드: {transcript.language_code})")
-                        result = [(entry['text']) for entry in transcript.fetch()]
-                        return result
-                    
-                    print("영어 자막을 찾을 수 없습니다.")
-                    return None
-                    
-        except Exception as e:
-            print(f"자막을 가져오는 중 오류가 발생했습니다: {str(e)}")
-            return None
+        # except Exception as e:
+        #     print(f"자막을 가져오는 중 오류가 발생했습니다: {str(e)}")
+        #     return None
+
 
 @st.cache_data
 def get_video_id(url):
@@ -544,15 +473,15 @@ def get_video_title(video_id):
 
 #여기서 부터는 영어 한국어 말고 다른거도 가능하게 바꿔주려고 Ko 도 바꿔야함
 @st.cache_data
-def get_best_want_no_time(video_id ,learn_code):
+def get_best_want_no_time(video_id ,learn_code,_transcript_list):
         # 선호하는 영어 자막 코드 목록
         
         try:
-            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+           # transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
             
             # 1. 먼저 수동 생성된 영어 자막 찾기 (모든 영어 변형 시도)
             try:      
-                transcript = transcript_list.find_manually_created_transcript(learn_code)
+                transcript = _transcript_list.find_manually_created_transcript(learn_code)
                 print(f"수동 생성된 배울 자막을 찾았습니다. (언어 코드: {learn_code})")
                 result = [(entry['text']) for entry in transcript.fetch()]
                 return result
@@ -560,14 +489,14 @@ def get_best_want_no_time(video_id ,learn_code):
             except:
                 # 2. 수동 자막이 없을 경우, 자동 생성된 영어 자막 찾기
                 try:
-                    transcript = transcript_list.find_generated_transcript(learn_code)
+                    transcript = _transcript_list.find_generated_transcript(learn_code)
                     print(f"자동 생성된 배울 자막을 찾았습니다. (언어 코드: {learn_code})")
                     result = [(entry['text']) for entry in transcript.fetch()]
                     return result
                     
                 except:
                     # 3. 마지막으로 'en'으로 시작하는 모든 코드 확인
-                    available_transcripts = list(transcript_list)
+                    available_transcripts = list(_transcript_list)
                     for transcript in available_transcripts:
                         if transcript.language_code.startswith(learn_code):
                             print(f"영어 자막을 찾았습니다. (언어 코드: {learn_code})")
@@ -581,15 +510,15 @@ def get_best_want_no_time(video_id ,learn_code):
             print(f"자막을 가져오는 중 오류가 발생했습니다: {str(e)}")
             return None
 @st.cache_data
-def get_best_to_translate_target(video_id , learn_code):
+def get_best_to_translate_target(video_id , learn_code, _transcript_list):
     
-        try:
-            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        #try:
+            #transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
             
             
             # 1. 먼저 수동 생성된 영어 자막 찾기 (모든 영어 변형 시도)
             try:
-                transcript = transcript_list.find_manually_created_transcript(learn_code)
+                transcript =  _transcript_list.find_manually_created_transcript(learn_code)
                 print(f"수동 생성된 영어 자막을 찾았습니다. {learn_code})")
                 result = [(entry['text']) for entry in transcript.translate(learn_code).fetch()]
                 return result
@@ -597,14 +526,14 @@ def get_best_to_translate_target(video_id , learn_code):
             except:
                 # 2. 수동 자막이 없을 경우, 자동 생성된 영어 자막 찾기
                 try:
-                    transcript = transcript_list.find_generated_transcript(learn_code)
+                    transcript =  _transcript_list.find_generated_transcript(learn_code)
                     print(f"자동 생성된 영어 자막을 찾았습니다.  {learn_code}")
                     result = [(entry['text']) for entry in transcript.translate(learn_code).fetch()]
                     return result
                     
                 except:
                     # 3. 마지막으로 'en'으로 시작하는 모든 코드 확인
-                    available_transcripts = list(transcript_list)
+                    available_transcripts = list( _transcript_list)
                     for transcript in available_transcripts:
                         if transcript.language_code.startswith(learn_code):
                             print(f" 자막을 찾았습니다.  {learn_code})")
@@ -614,19 +543,19 @@ def get_best_to_translate_target(video_id , learn_code):
                     print("한글 자막을 찾을 수 없습니다.")
                     return ""
                     
-        except Exception as e:
-            print(f"자막을 가져오는 중 오류가 발생했습니다: {str(e)}")
-            return None
+        # except Exception as e:
+        #     print(f"자막을 가져오는 중 오류가 발생했습니다: {str(e)}")
+        #     return None
 @st.cache_data
-def get_best_want_in_time(video_id ,learn_code):
+def get_best_want_in_time(video_id ,learn_code, _transcript_list):
         # 선호하는 영어 자막 코드 목록
         
         try:
-            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+            #transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
             
             # 1. 먼저 수동 생성된 영어 자막 찾기 (모든 영어 변형 시도)
             try:      
-                transcript = transcript_list.find_manually_created_transcript(learn_code)
+                transcript =  _transcript_list.find_manually_created_transcript(learn_code)
                 print(f"수동 생성된 배울 자막을 찾았습니다. {learn_code} )")
                 result = [(entry['text']) for entry in transcript.fetch()]
                 return result
@@ -634,14 +563,14 @@ def get_best_want_in_time(video_id ,learn_code):
             except:
                 # 2. 수동 자막이 없을 경우, 자동 생성된 영어 자막 찾기
                 try:
-                    transcript = transcript_list.find_generated_transcript(learn_code)
+                    transcript =  _transcript_list.find_generated_transcript(learn_code)
                     print(f"자동 생성된 배울 자막을 찾았습니다. {learn_code} )")
                     result = [(entry['start'] ,entry['text']) for entry in transcript.fetch()]
                     return result
                     
                 except:
                     # 3. 마지막으로 'en'으로 시작하는 모든 코드 확인
-                    available_transcripts = list(transcript_list)
+                    available_transcripts = list( _transcript_list)
                     for transcript in available_transcripts:
                         if transcript.language_code.startswith('en'):
                             print(f" 배울 자막을 찾았습니다. {learn_code} )")
@@ -655,28 +584,28 @@ def get_best_want_in_time(video_id ,learn_code):
             print(f"자막을 가져오는 중 오류가 발생했습니다: {str(e)}")
             return None
 @st.cache_data
-def get_best_learn_code(video_id , learn_code):
+def get_best_learn_code(video_id , learn_code, _transcript_list):
         
 
         # 선호하는 영어 자막 코드 목록
-            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+            #transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
             
             # 1. 먼저 수동 생성된 영어 자막 찾기 (모든 영어 변형 시도)
             try:
-                transcript = transcript_list.find_manually_created_transcript(learn_code)
+                transcript =  _transcript_list.find_manually_created_transcript(learn_code)
                 print(f"수동 생성된 영어 자막을 찾았습니다.{learn_code} ")
                 return learn_code
                 
             except:
                 # 2. 수동 자막이 없을 경우, 자동 생성된 영어 자막 찾기
                 try:
-                    transcript = transcript_list.find_generated_transcript(learn_code)
+                    transcript =  _transcript_list.find_generated_transcript(learn_code)
                     print(f"자동 생성된 영어 자막을 찾았습니다. {learn_code} ")
                     return learn_code
                     
                 except:
                     # 3. 마지막으로 'en'으로 시작하는 모든 코드 확인
-                    available_transcripts = list(transcript_list)
+                    available_transcripts = list( _transcript_list)
                     for transcript in available_transcripts:
                         if transcript.language_code.startswith(learn_code):
                             print(f"자막을 찾았습니다. (언어 코드: {learn_code} ")
@@ -1355,15 +1284,15 @@ else:
 
                     if want_language == "English":
 
-                        want_lang_no_time = get_best_english_transcript_no_time(video_id)
-                        want_code_check = get_best_english_encode(video_id)
-                        want_lang_in_time = get_best_english_transcript(video_id)
+                        want_lang_no_time = get_best_english_transcript_no_time(video_id,transcript_list)
+                        want_code_check = get_best_english_encode(video_id,transcript_list)
+                        want_lang_in_time = get_best_english_transcript(video_id,transcript_list)
                        
                         
                     else:
-                        want_lang_no_time = get_best_want_no_time(video_id, learn_code)
-                        want_code_check  = get_best_learn_code(video_id , learn_code)
-                        want_lang_in_time= get_best_want_in_time(video_id,learn_code)
+                        want_lang_no_time = get_best_want_no_time(video_id, learn_code,transcript_list)
+                        want_code_check  = get_best_learn_code(video_id , learn_code,transcript_list)
+                        want_lang_in_time= get_best_want_in_time(video_id,learn_code,transcript_list)
                        
                     
                     if want_code_check == None:
@@ -1488,7 +1417,7 @@ else:
                             word_file = create_word_file_shadow_script(result_only_want_for_word,title_video,learn_code,want_font,native_font,font_size)
                             
 
-                            result_target_script =get_best_to_translate_target(video_id , native_code)
+                            result_target_script =get_best_to_translate_target(video_id , native_code,transcript_list)
                             new_target_script = ""
 
                             for read_script_target_line in result_target_script:
