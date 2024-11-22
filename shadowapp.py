@@ -29,6 +29,11 @@ def get_video_info(url):
 def create_modern_ui():
     # 헤더 섹션
     st.markdown("""
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4095011834932682"
+     crossorigin="anonymous"></script>
+""", unsafe_allow_html=True)
+    
+    st.markdown("""
         <div style='text-align: center; padding: 2rem 0;'>
             <h1 style='color: #1E88E5;'>▶️ ShadowTube</h1>
             <p style='font-size: 1.2rem; color: #424242;'>AI Shadowing Script Generator</p>
