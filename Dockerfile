@@ -1,5 +1,5 @@
 # Python 3.11 이미지를 기반으로 생성
-FROM python:3.11
+FROM python:3.12.2
 
 # 작업 디렉토리 설정
 WORKDIR /app

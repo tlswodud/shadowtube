@@ -228,7 +228,9 @@ from io import BytesIO
 
 from docx.oxml import OxmlElement
 
-
+import os
+for key, value in os.environ.items():
+    print(f"{key}: {value}")
 
 def create_word_file_shadow_script(content, utb_title, learn_code, want_font, native_font, font_size): 
     """
@@ -686,9 +688,6 @@ user_input= url
 video_id = get_video_id(user_input)
 
 #title_video = get_video_title(video_id)
-
-
-
 
 
 def target_translate_isavailable(video_id):
