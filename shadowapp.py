@@ -2,12 +2,34 @@ import streamlit as st
 
 import yt_dlp
 
+# def get_video_info(url):
+#     try:
+#         ydl_opts = {
+#             'quiet': True,
+#             'no_warnings': True,
+#             'extract_flat': True
+#         }
+#         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+#             info = ydl.extract_info(url, download=False)
+#             return {
+#                 'title': info.get('title'),
+#                 'channel': info.get('uploader'),
+#                 'thumbnail': info.get('thumbnail'),
+#                 'duration': info.get('duration'),
+#                 'view_count': info.get('view_count')
+#             }
+#     except Exception as e:
+#         st.error(f"비디오 정보를 가져오는데 실패했습니다: {str(e)}")
+#         return None
 def get_video_info(url):
     try:
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
-            'extract_flat': True
+            'extract_flat': True,
+            'no_check_certificate': True,  # 인증서 체크 건너뛰기
+            'ignoreerrors': True,  # 에러 무시
+            'no_warnings': True    # 경고 메시지 숨기기
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
