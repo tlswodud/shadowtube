@@ -21,15 +21,19 @@ import yt_dlp
 #     except Exception as e:
 #         st.error(f"비디오 정보를 가져오는데 실패했습니다: {str(e)}")
 #         return None
+
 def get_video_info(url):
     try:
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
             'extract_flat': True,
-            'no_check_certificate': True,  # 인증서 체크 건너뛰기
-            'ignoreerrors': True,  # 에러 무시
-            'no_warnings': True    # 경고 메시지 숨기기
+            'no_check_certificate': True,
+            'ignoreerrors': True,
+            'no_warnings': True,
+            # ffmpeg 관련 옵션 추가
+            'prefer_ffmpeg': False,  # ffmpeg 사용 비활성화
+            'postprocessors': []     # 후처리 비활성화
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
@@ -43,6 +47,7 @@ def get_video_info(url):
     except Exception as e:
         st.error(f"비디오 정보를 가져오는데 실패했습니다: {str(e)}")
         return None
+
     
 def create_modern_ui():
     # 헤더 섹션
