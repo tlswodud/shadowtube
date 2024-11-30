@@ -1241,7 +1241,7 @@ def create_settings_sidebar():
         )
         
         want_font = st.text_input(
-            "Want Learn Language font",
+            "Target Language Font",
             value="Cambria",
             help="default setting : Cambria"
         )
@@ -1297,8 +1297,8 @@ settings = create_settings_sidebar()
 if not settings["api_key"]:
         st.warning("Please enter the Gemini API key in the sidebar.")
         st.stop()
-st.write(f"- Slected native font: {settings['native_font']}")
-st.write(f"- Slected learning font: {settings['want_font']}")
+st.write(f"- Slected native language font: {settings['native_font']}")
+st.write(f"- Slected target language font: {settings['want_font']}")
 st.write(f"- Font Size: {settings['font_size']}px")
 
 native_font = settings['native_font']
@@ -1721,24 +1721,24 @@ else:
                                 # 워드 파일 다운로드 버튼
                             
                             st.download_button(
-                                            label="📄 Download Subtitles I Want to Learn.docx",
+                                            label="📄 Download Learning Languages Script.docx",
                                             data=word_file,
-                                            file_name="Want_Learn_language.docx",
+                                            file_name="Learning Languages Script.docx",
                                             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                                             key="download_button_1"
                                 )
                             st.download_button(
-                                            label="📄 Download Advanced Language.docx",
+                                            label="📄 Download Difficult Words List.docx",
                                             data=word_file_adw,
-                                            file_name="Advanced Language.docx",
+                                            file_name="Difficult_Words_List.docx",
                                             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                                             key="download_button_word_file_adw"
                                 )
                             
                             st.download_button(
-                                    label="📄 Download Shadowing File_Analysis Version.docx",
+                                    label="📄 Download Shadowing_Script (Translation and Difficult Words).docx",
                                     data=word_file_shadowing_script ,
-                                    file_name="Shadowing File_Analysis.docx",
+                                    file_name="Shadowing Script.docx",
                                     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                                     key="download_button_merged_shadowing_script"
                                     )            
