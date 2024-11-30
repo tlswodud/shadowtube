@@ -41,15 +41,21 @@ def create_modern_ui():
          encoded_Logo = base64.b64encode(image_file.read()).decode()
                    
     st.markdown(f"""
+    <style>
+        @media (max-width: 600px) {{
+            .shadowtube-title {{
+                font-size: 1.5rem; /* 핸드폰에서의 글씨 크기 */
+            }}
+        }}
+    </style>
     <div style="display: flex; justify-content: center; align-items: center; height: 20vh; flex-direction: column;">
             <div style='display:flex;align-items: center; padding: 1rem 0;'>
                 <img src="data:image/png;base64,{encoded_Logo}" width="47">
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <h1 style='color: #1E88E5;'>ShadowTube</h1>
+                <h1 class='shadowtube-title' style='color: #1E88E5;'>ShadowTube</h1>
             </div>
         <p style='font-size: 1.2rem; color: #424242;'>AI Shadowing Script Generator</p>
     </div>
-
     """, unsafe_allow_html=True)
 
     # 소개 섹션 - 카드 스타일 디자인
@@ -149,6 +155,7 @@ def create_modern_ui():
         3. Choose the language you want to learn
         4. Paste a YouTube URL
         5. Click 'Generate' to create your learning materials
+        6. 쿠팡 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.            
         """)
     return url ,  native_language  ,target_language
 
@@ -1247,6 +1254,36 @@ def create_settings_sidebar():
             value=11,
             step=1
         )
+
+        st.subheader("Developer's blog")
+        st.markdown("""
+            <a href="https://fktshin.tistory.com/15" 
+               target="_blank"
+               style="text-decoration: none;">
+                <div style="background-color: #A8E6CF; 
+                            padding: 7px 20px; 
+                            border-radius: 10px; 
+                            text-align: center; 
+                            margin: 10px 0;
+                            display: inline-block;
+                            width: 100%;
+                            box-sizing: border-box;
+                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);">
+                    <div style="display: flex; 
+                                align-items: center; 
+                                justify-content: center; 
+                                gap: 8px;
+                                color: #1a1a1a;
+                                font-size: 14px;
+                                font-weight: 500;
+                                letter-spacing: 0.25px;">
+                        <span style="color: #1a1a1a;">🌱</span>
+                        <span style="color: #1a1a1a;">Visit Blog!</span>
+                    </div>
+                </div>
+            </a>
+            """, unsafe_allow_html=True)
         
         return {
             "api_key": api_key,
@@ -1282,8 +1319,7 @@ else:
             transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
         except:
             display_chat_message("google Ban this service...Really?")
-
-        # transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        
         print("api_work")
         
        
@@ -1709,8 +1745,9 @@ else:
                             st.success("I've completed it! Expand your world!", icon="✅")
                             #display_chat_message("assistant","I've completed it! Expand your world!")
                             st.balloons()
+                            
                             st.markdown("""<a href="https://link.coupang.com/a/b2LEz4" target="_blank" referrerpolicy="unsafe-url"><img src="https://ads-partners.coupang.com/banners/823313?subId=&traceId=V0-301-50c6c2b97fba9aee-I823313&w=728&h=90" alt=""></a>""",unsafe_allow_html=True)
-
+                            
             except Exception as e:
                 # list_available_languages에서 에러가 발생하면 처리
                 st.warning(f"YouTube subtitles access is restricted. Please choose another video")
