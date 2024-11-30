@@ -24,38 +24,43 @@ def get_video_info(url):
         st.error(f"비디오 정보를 가져오는데 실패했습니다: {str(e)}")
         return None
 
-
-    
+import base64
 def create_modern_ui():
     # 헤더 섹션
     st.markdown("""
     <head>
-        <meta name="google-adsense-account" content="ca-pub-4095011834932682">
+        <meta name="google-adsense-account" content="ca-pub-4095011834932682">                     
     </head>
     """, unsafe_allow_html=True)
-    
     st.markdown("""
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4095011834932682"
      crossorigin="anonymous"></script>
     """, unsafe_allow_html=True)
+    
+    with open("./image/shadowLogo.png", "rb") as image_file:
+         encoded_Logo = base64.b64encode(image_file.read()).decode()
+                   
+    st.markdown(f"""
+    <div style="display: flex; justify-content: center; align-items: center; height: 20vh; flex-direction: column;">
+            <div style='display:flex;align-items: center; padding: 1rem 0;'>
+                <img src="data:image/png;base64,{encoded_Logo}" width="47">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <h1 style='color: #1E88E5;'>ShadowTube</h1>
+            </div>
+        <p style='font-size: 1.2rem; color: #424242;'>AI Shadowing Script Generator</p>
+    </div>
 
-    
-    st.markdown("""
-        <div style='text-align: center; padding: 2rem 0;'>
-            <h1 style='color: #1E88E5;'>▶️ ShadowTube</h1>
-            <p style='font-size: 1.2rem; color: #424242;'>AI Shadowing Script Generator</p>
-        </div>
     """, unsafe_allow_html=True)
-    
+
     # 소개 섹션 - 카드 스타일 디자인
     st.markdown("""
-        <div style='background-color: #F8F9FA; padding: 2rem; border-radius: 10px; margin: 1rem 0;'>
+        <div style='background-color: #F8F9FA; padding: 2rem; border-radius: 10px; margin: 1rem; max-width: 100%; overflow: hidden;'>
             <h3 style='color: black;'>🚀 Learn Languages Through YouTube!</h3>
             <p style='font-size: 1.1rem; color: #424242;'>
                 Easily transform your favorite YouTube videos into powerful learning materials!
             </p>
-            <div style='display: flex; gap: 1rem; margin-top: 1rem;'>
-                <div style='background: #E3F2FD; padding: 1rem; border-radius: 8px; flex: 1;'>
+            <div style='display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;'>
+                <div style='background: #E3F2FD; padding: 1rem; border-radius: 8px; flex: 1; min-width: 200px;'>
                     <h4>✨ Features</h4>
                     <ul style='margin: 0;'>
                         <li>Translations</li>
@@ -63,7 +68,7 @@ def create_modern_ui():
                         <li>Shadowing scripts</li>
                     </ul>
                 </div>
-                <div style='background: #E8F5E9; padding: 1rem; border-radius: 8px; flex: 1;'>
+                <div style='background: #E8F5E9; padding: 1rem; border-radius: 8px; flex: 1; min-width: 200px;'>
                     <h4>📚 Benefits</h4>
                     <ul style='margin: 0;'>
                         <li>Learn from your favorite content.</li>
@@ -161,7 +166,7 @@ def get_language_code(language):
 
 st.set_page_config(
     page_title="ShadowTube",
-    page_icon="▶️",
+    page_icon="./image/shadowLogo.png",
     layout="centered"
 )
 # 스타일링
@@ -216,7 +221,7 @@ def display_chat_message(role, content):
             <div>{content}</div>
         </div>
     """, unsafe_allow_html=True)
-
+  
 import streamlit as st
 from io import BytesIO
 from docx import Document
@@ -522,42 +527,36 @@ def get_best_want_no_time(video_id ,learn_code,_transcript_list):
             print(f"자막을 가져오는 중 오류가 발생했습니다: {str(e)}")
             return None
 @st.cache_data
-def get_best_to_translate_target(video_id , learn_code, _transcript_list):
-    
-        #try:
-            #transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-            
+def get_best_to_translate_target(video_id,native_code,_transcript_list):
             
             # 1. 먼저 수동 생성된 영어 자막 찾기 (모든 영어 변형 시도)
             try:
-                transcript =  _transcript_list.find_manually_created_transcript(learn_code)
-                print(f"수동 생성된 영어 자막을 찾았습니다. {learn_code})")
-                result = [(entry['text']) for entry in transcript.translate(learn_code).fetch()]
+                transcript =  _transcript_list.find_manually_created_transcript(native_code)
+                print(f"수동 생성된 영어 자막을 찾았습니다. {native_code})")
+                result = [(entry['text']) for entry in transcript.translate(native_code).fetch()]
+                
                 return result
             
             except:
                 # 2. 수동 자막이 없을 경우, 자동 생성된 영어 자막 찾기
                 try:
-                    transcript =  _transcript_list.find_generated_transcript(learn_code)
-                    print(f"자동 생성된 영어 자막을 찾았습니다.  {learn_code}")
-                    result = [(entry['text']) for entry in transcript.translate(learn_code).fetch()]
+                    transcript =  _transcript_list.find_generated_transcript(native_code)
+                    print(f"자동 생성된 영어 자막을 찾았습니다.{native_code}")
+                    result = [(entry['text']) for entry in transcript.translate(native_code).fetch()]
                     return result
                     
                 except:
-                    # 3. 마지막으로 'en'으로 시작하는 모든 코드 확인
-                    available_transcripts = list( _transcript_list)
+                    
+                    available_transcripts = list(_transcript_list)
                     for transcript in available_transcripts:
-                        if transcript.language_code.startswith(learn_code):
-                            print(f" 자막을 찾았습니다.  {learn_code})")
-                        result = [(entry['text']) for entry in transcript.translate(learn_code).fetch()]
+                        if transcript.language_code.startswith(native_code):
+                            print(f" 자막을 찾았습니다.  {native_code})")
+                        result = [(entry['text']) for entry in transcript.translate(native_code).fetch()]
                         return result
                     
                     print("한글 자막을 찾을 수 없습니다.")
                     return ""
-                    
-        # except Exception as e:
-        #     print(f"자막을 가져오는 중 오류가 발생했습니다: {str(e)}")
-        #     return None
+ 
 @st.cache_data
 def get_best_want_in_time(video_id ,learn_code, _transcript_list):
         # 선호하는 영어 자막 코드 목록
@@ -1191,7 +1190,7 @@ def create_settings_sidebar():
         # Gemini API 설정 섹션
         st.header("API Setting")
         api_key = st.text_input(
-            "Gemini API Key",
+            "Google Gemini 1.5 Flash API Key",
             type="password",
             help="Please enter the Gemini API key issued from Google Cloud Console."
         )
@@ -1206,7 +1205,7 @@ def create_settings_sidebar():
                             text-align: center; 
                             margin: 10px 0;
                             display: inline-block;
-                            width: 100%;
+                             width: 100%;
                             box-sizing: border-box;
                             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
                             box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);">
@@ -1219,7 +1218,7 @@ def create_settings_sidebar():
                                 font-weight: 500;
                                 letter-spacing: 0.25px;">
                         <span style="color: #1a1a1a;">🔑</span>
-                        <span style="color: #1a1a1a;">Get your Api key.</span>
+                        <span style="color: #1a1a1a;">Get your Free Api key.</span>
                     </div>
                 </div>
             </a>
@@ -1287,9 +1286,13 @@ else:
         # transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
         print("api_work")
         
+       
+                            
         # 채팅 처리
         if user_input:
             # 사용자 메시지 표시
+            st.markdown("""<a href="https://link.coupang.com/a/b2L2wF" target="_blank" referrerpolicy="unsafe-url"><img src="https://ads-partners.coupang.com/banners/823356?subId=&traceId=V0-301-8be2627c04ed5569-I823356&w=728&h=90" alt=""></a>""",unsafe_allow_html=True)
+            
             display_chat_message("user", user_input)
 
             # AI 응답 (예시)
@@ -1345,10 +1348,23 @@ else:
                                     if dot_Check == False and want_language  == "English": # 영어 일때만 문장 구분 
                                         #display_chat_message("assistant", dot_Check)
                                             # 문장 구분이 필요한 단어 리스트
-                                        keywords = ["I", "And", "But", "Now", "What", "How", "Have", "Did", "No", "In", 
+                                        keywords = [
+                                        "I", "And", "But", "Now", "What", "How", "Have", "Did", "No", "In", 
                                         "So", "Then", "Or", "Why", "Yes", "If", "When", "Because", 
                                         "Well", "Oh", "Ah", "Okay", "Alright", 
-                                        "Therefore", "However", "Moreover", "Though", "Although"]
+                                        "Therefore", "However", "Moreover", "Though", "Although", 
+                                        "and you", "You", "They",
+                                        "Yet", "Still", "Nonetheless", "Nevertheless", 
+                                        "After", "Before", "Until", "While", "Since", "Once", 
+                                        "Thus", "Hence", "Consequently", "Unless", "Whether", "As", 
+                                        "Indeed", "Certainly", "Surely", 
+                                        "We", "It", "He", "She", "This", "That", "These", "Those",
+                                        "For instance",  
+                                        "Such as", "For example", "Like", "On the other hand","if you",
+                                        "do you" , "there are" ,"There" ,"and it","and we", "and they", "and i"
+                                        "if we","if they","if i", 
+                                        "To summarize"
+                                    ]
                                         for word in keywords:
                                             read_script  = read_script.replace(word , f".{word}")
                                             
@@ -1436,8 +1452,9 @@ else:
                             
                             word_file = create_word_file_shadow_script(result_only_want_for_word,title_video,learn_code,want_font,native_font,font_size)
                             
-
-                            result_target_script =get_best_to_translate_target(video_id , native_code,transcript_list)
+    
+                            
+                            result_target_script =  get_best_to_translate_target(video_id ,native_code,transcript_list) 
                             new_target_script = ""
 
                             for read_script_target_line in result_target_script:
@@ -1467,8 +1484,6 @@ else:
                             
                             
                             kor_script_line = new_target_script.splitlines()
-
-                            #display_chat_message("assistant", result_target_script)
                             
                             import google.generativeai as genai
                                                             
@@ -1480,10 +1495,11 @@ else:
                                     stop_sequences=["x"],
                                     temperature=0,
                                 )
+                                response = model.generate_content("Hello, how is the API working? if you're working , put your hands UP!!")
                             except Exception as e:
                                 print(f"An error occurred: {e}")
                                 # Add further actions like retrying or prompting for a valid API key.
-                                st.warning("Please check the Gemini API again.")
+                                st.warning("Please check your Gemini API again.")
                                 st.stop()
 
                             display_chat_message("assistant","I'm working hard on the analysis, but it might take some time. Please wait a moment!") 
@@ -1520,7 +1536,7 @@ else:
                             if native_code == "fr":
                                     gemini_transcript= gemini_check_advanced_word_im_fran(model, result_want_transcript, generation_config)
 
-                            
+                           
 
                             #원래는 문제가 있는 개별을 번역해주려했으나 가끔 오류가 발생 사용불가
                             def translate_with_gemini(model, text, source_lang, target_lang):
@@ -1571,8 +1587,7 @@ else:
                                         print("최대 재시도 횟수를 초과했습니다.")
                                         return None
                             
-                            
-                            
+
                             from sentence_transformers import SentenceTransformer  # 텍스트 백터 변환
                             from sklearn.metrics.pairwise import cosine_similarity # 벡터 유사도 계산
                             import numpy as np
@@ -1590,12 +1605,12 @@ else:
                             
 
                             # 문장 임베딩 모델 로드 (다국어 지원 모델 사용)
-                            #model_simul = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
+                            model_simul = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
                             #model_simul = SentenceTransformer('paraphrase-xlm-r-multilingual-v1')
                             
                             # 영어와 한글 문장의 임베딩 벡터 생성 # 임베딩 생성
                             # 문장 임베딩 모델 로드 (도커 컨테이너 내부 경로에서 로드)
-                            model_simul = SentenceTransformer('/app/model/sentence_transformer')
+                            #model_simul = SentenceTransformer('/app/model/sentence_transformer')
                             english_embeddings = model_simul.encode(english_lines)
                             korean_embeddings = model_simul.encode(korean_lines)
 
@@ -1694,13 +1709,11 @@ else:
                             st.success("I've completed it! Expand your world!", icon="✅")
                             #display_chat_message("assistant","I've completed it! Expand your world!")
                             st.balloons()
-                
-
+                            st.markdown("""<a href="https://link.coupang.com/a/b2LEz4" target="_blank" referrerpolicy="unsafe-url"><img src="https://ads-partners.coupang.com/banners/823313?subId=&traceId=V0-301-50c6c2b97fba9aee-I823313&w=728&h=90" alt=""></a>""",unsafe_allow_html=True)
 
             except Exception as e:
                 # list_available_languages에서 에러가 발생하면 처리
-                st.warning(f"YouTube subtitles access is restricted. Please choose another video.{e}")
+                st.warning(f"YouTube subtitles access is restricted. Please choose another video")
     except Exception as e:
         # transcript_list 초기화에서 에러가 발생하면 처리
-         st.warning(f"YouTube subtitles access is restricted. Please choose another video.{e}")
-
+         st.warning(f"YouTube subtitles access is restricted. Please choose another video.")
