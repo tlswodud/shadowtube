@@ -20,8 +20,8 @@ COPY model_download.py /app/model_download.py
 RUN python /app/model_download.py
 
 # 로고 이미지
+COPY ./image/shadowLogo2.png /app/image/shadowLogo2.png
 COPY ./image/shadowLogo.png /app/image/shadowLogo.png
-
 # 포트 설정
 EXPOSE 8080
 

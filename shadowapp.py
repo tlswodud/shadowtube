@@ -38,7 +38,7 @@ def create_modern_ui():
      crossorigin="anonymous"></script>
     """, unsafe_allow_html=True)
     
-    with open("./image/shadowLogo.png", "rb") as image_file:
+    with open("./image/shadowLogo2.png", "rb") as image_file:
          encoded_Logo = base64.b64encode(image_file.read()).decode()
                    
     st.markdown(f"""
@@ -67,7 +67,7 @@ def create_modern_ui():
                 Easily transform your favorite YouTube videos into powerful learning materials!
             </p>
             <div style='display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;'>
-                <div style='background: #E3F2FD; padding: 1rem; border-radius: 8px; flex: 1; min-width: 200px;'>
+                <div style='background: #E3F2FD; padding: 1rem; border-radius: 8px; flex: 1; min-width: 200px;color: #000;'>
                     <h4>✨ Features</h4>
                     <ul style='margin: 0;'>
                         <li>Translations</li>
@@ -75,7 +75,7 @@ def create_modern_ui():
                         <li>Shadowing scripts</li>
                     </ul>
                 </div>
-                <div style='background: #E8F5E9; padding: 1rem; border-radius: 8px; flex: 1; min-width: 200px;'>
+                <div style='background: #E8F5E9; padding: 1rem; border-radius: 8px; flex: 1; min-width: 200px;color: #000;'>
                     <h4>📚 Benefits</h4>
                     <ul style='margin: 0;'>
                         <li>Learn from your favorite content.</li>
@@ -1387,19 +1387,19 @@ else:
                                         #display_chat_message("assistant", dot_Check)
                                             # 문장 구분이 필요한 단어 리스트
                                         keywords = [
-                                        "I ", "And", "But", "Now", "What", "How", "Have", "Did", "In", 
-                                        "Then", "Or", "Why", "Yes", "If", "When", "Because", 
-                                        "Well", "Oh", "Ah", "Okay", "Alright", 
+                                        "I ", "And ", "But ", "Now ", "What", "How", "Have", "Did", "In ", 
+                                        "Then", "Or", "Why", "Yes", "If ", "When", "Because", 
+                                        "Well", "Oh ", "Ah  ", "Okay", "Alright", 
                                         "Therefore", "However", "Moreover", "Though", "Although", 
-                                        "and you", "You", "They",
+                                        "You", "They",
                                         "Yet", "Still", "Nonetheless", "Nevertheless", 
                                         "After", "Before", "Until", "While", "Since", "Once", 
                                         "Thus", "Hence", "Consequently", "Unless", "Whether", "As", 
                                         "Indeed", "Certainly", "Surely", 
-                                        "We", "It", "He", "She", "This", "That", "These", "Those",
+                                        "We", "It  ", "He  ", "She ", "This ", "That ", "These", "Those",
                                         "For instance",  
                                         "Such as", "For example", "Like", "On the other hand",
-                                         "There" ,
+                                         "There " ,""
                                         "To summarize" 
                                     ]
                                         for word in keywords:
@@ -1489,61 +1489,63 @@ else:
                             
                             result_if_too_Long = ""
                             
-                            if dot_Check == False and want_language == "English":
-                                for line in result_want_script:
-                                    if len(line) > 230:
-                                        keywords = ["and ", "but ", "there ", "if ", "do "]
-                                        start = 0  # 검색 시작 위치
-                                    
-                                    
-                                    
-                                    while start < len(line):  # 줄 끝까지 처리
-                                        # 각 키워드의 위치 찾기
-                                        # index_list = [line.find(word, start) for word in keywords]
-                                        # index_list = [i for i in index_list if i != -1]  # -1 값 제거
-                                        index_list = [line.find(word, start) for word in keywords]
-                                        index_list = [i for i in index_list if i != -1] 
-                                        # 키워드가 없는 경우 종료
-                                        if not index_list:
-                                            break
+                            #if dot_Check == False and want_language == "English":
+                            for line in result_want_script:
+                                if len(line) > 230:
+                                    keywords = ["and ", "but ", "there ", "if ", "do ","it " ,"he ","what ","you ","she ","that ","they" ]
+                                    start = 0  # 검색 시작 위치
+                                
+                                
+                                
+                                while start < len(line):  # 줄 끝까지 처리
+                                    # 각 키워드의 위치 찾기
+                                    # index_list = [line.find(word, start) for word in keywords]
+                                    # index_list = [i for i in index_list if i != -1]  # -1 값 제거
+                                    index_list = [line.find(word, start) for word in keywords]
+                                    index_list = [i for i in index_list if i != -1 and line[i-1].isalpha() == False] 
+                                    index_list = sorted(index_list)
+                                    #display_chat_message("assistant" , index_list)
+                                    # 키워드가 없는 경우 종료
+                                    if not index_list:
+                                        break
 
-                                        # 각 index에 대해 처리
-                                        found_valid = False  # 조건을 충족하는 키워드가 있는지 확인하는 변수
-                                        for index in index_list:
+                                    # 각 index에 대해 처리
+                                    found_valid = False  # 조건을 충족하는 키워드가 있는지 확인하는 변수
+                                    for index in index_list:
+                                    
+                                        dot_index = len(line)  # "."이 없으면, 줄 끝까지 처리
                                         
-                                            dot_index = len(line)  # "."이 없으면, 줄 끝까지 처리
+                                        # 조건 확인
+                                        if len(line[start:index]) >= 100 and len(line[index:dot_index]) >= 100:
+                                            # 키워드 앞에 ".\n" 추가
+                                            word = next(word for word in keywords if line.find(word, start) == index)
+                                            line = line[:index] + f".\n{word}" + line[index + len(word):]
+                                            lines = f".\n{word}" + line[index + len(word):]
+                                            #display_chat_message("assistant", f"{word} :  {lines}")
+
+                                            # `start`를 삽입 후 위치로 업데이트
+                                            start = index + len(f".\n{word}")
+                                            found_valid = True
+                                            break
+                                                
+
+                                    # 조건을 만족하는 키워드가 없으면 start를 다음 위치로 업데이트
+                                    if found_valid ==  False:
+                                        start = index + 1
+
+                                        
                                             
-                                            # 조건 확인
-                                            if len(line[start:index]) >= 100 and len(line[index:dot_index]) >= 100:
-                                                # 키워드 앞에 ".\n" 추가
-                                                word = next(word for word in keywords if line.find(word, start) == index)
-                                                line = line[:index] + f".\n{word}" + line[index + len(word):]
-                                               
-                                                # `start`를 삽입 후 위치로 업데이트
-                                                start = index + len(f".\n{word}")
-                                                found_valid = True
-                                                break
-                                                 
-
-                                        # 조건을 만족하는 키워드가 없으면 start를 다음 위치로 업데이트
-                                        if not found_valid:
-                                            start = index + 1
-                                             
-                                           
-                            
-
-                                        # 변환된 줄을 결과에 추가
-                                    result_if_too_Long += line
-                                    result_if_too_Long += "\n"
+                                    # 변환된 줄을 결과에 추가
+                                result_if_too_Long += line
+                                result_if_too_Long += "\n"
 
                             # 결과 확인
                             
-                           
                                 #display_chat_message("assistant" , result_if_too_Long)
                                 result_want_script = result_if_too_Long.splitlines()
-                   
+                           
                             for line in  result_want_script:
-                            
+                                    
                                     result_want_transcript.append("\n")
                                     result_want_transcript.append(clean_transcript_texts([line]))
                                     result_want_transcript.append("\n")    
@@ -1693,6 +1695,7 @@ else:
                                         print("최대 재시도 횟수를 초과했습니다.")
                                         return None
                             
+                            #display_chat_message("assistant" , gemini_transcript)
 
                             from sentence_transformers import SentenceTransformer  # 텍스트 백터 변환
                             from sklearn.metrics.pairwise import cosine_similarity # 벡터 유사도 계산
@@ -1726,7 +1729,7 @@ else:
                             # 유사도가 가장 높은 문장끼리 매칭
                             merged_lines = ["\n\n\n"]
                             used_korean_indices = set() # 사용한 한국어는 지우기 위해 집합 사용
-            
+
                             for eng_idx, eng_sentence in enumerate(english_lines):
                                 # 각 영어 문장에 대해 가장 유사한 한글 문장을 찾음
                                 if not eng_sentence.strip():
@@ -1741,7 +1744,6 @@ else:
                                     for j in range(len(gemini_lines)):
                                             if time_str in gemini_lines[j]:  # time_str이 adw[j]에 있는지 확인
                                                 kor_sentence = gemini_lines[j]
-                                               
                                             else:
                                                 best_kor_idx = np.argmax(similarity_matrix[eng_idx])
                                                 best_kor_similarity = similarity_matrix[eng_idx, best_kor_idx]             
@@ -1752,16 +1754,11 @@ else:
 
                                                 used_korean_indices.add(best_kor_idx)
                                     
-                                                kor_sentence = re.sub(r'\[\d{2}:\d{2}\]','', kor_sentence)
+                                            kor_sentence = re.sub(r'\[\d{2}:\d{2}\]','', kor_sentence)
                                
-                                else: 
+                                else:
                                     best_kor_idx = np.argmax(similarity_matrix[eng_idx])
-                                    
                                     best_kor_similarity = similarity_matrix[eng_idx, best_kor_idx]             
-                                    
-                                    if best_kor_similarity < 0.5:
-                                        kor_sentence = " "
-                                        pass
 
                                     if best_kor_idx not in used_korean_indices:
                                                         
@@ -1770,9 +1767,7 @@ else:
                                     used_korean_indices.add(best_kor_idx)
                         
                                     kor_sentence = re.sub(r'\[\d{2}:\d{2}\]','', kor_sentence)
-                                
-                        
-                                                
+                    
                                         
                                 merged_lines.append(eng_sentence)
                                 merged_lines.append("\n\n")
