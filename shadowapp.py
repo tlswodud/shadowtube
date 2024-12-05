@@ -27,6 +27,7 @@ def get_video_info(url):
 import base64
 def create_modern_ui():
     # 헤더 섹션
+
     st.markdown("""
     <head>
         <meta name="google-adsense-account" content="ca-pub-4095011834932682">                     
@@ -174,7 +175,8 @@ def get_language_code(language):
 st.set_page_config(
     page_title="ShadowTube",
     page_icon="./image/shadowLogo.png",
-    layout="centered"
+    layout="centered",
+   
 )
 # 스타일링
 st.markdown("""
@@ -1385,8 +1387,8 @@ else:
                                         #display_chat_message("assistant", dot_Check)
                                             # 문장 구분이 필요한 단어 리스트
                                         keywords = [
-                                        "I", "And", "But", "Now", "What", "How", "Have", "Did", "No", "In", 
-                                        "So", "Then", "Or", "Why", "Yes", "If", "When", "Because", 
+                                        "I ", "And", "But", "Now", "What", "How", "Have", "Did", "In", 
+                                        "Then", "Or", "Why", "Yes", "If", "When", "Because", 
                                         "Well", "Oh", "Ah", "Okay", "Alright", 
                                         "Therefore", "However", "Moreover", "Though", "Although", 
                                         "and you", "You", "They",
@@ -1396,32 +1398,38 @@ else:
                                         "Indeed", "Certainly", "Surely", 
                                         "We", "It", "He", "She", "This", "That", "These", "Those",
                                         "For instance",  
-                                        "Such as", "For example", "Like", "On the other hand","if you",
-                                        "do you" , "there are" ,"There" ,"and it","and we", "and they", "and i"
-                                        "if we","if they","if i", 
-                                        "To summarize"
+                                        "Such as", "For example", "Like", "On the other hand",
+                                         "There" ,
+                                        "To summarize" 
                                     ]
                                         for word in keywords:
                                             read_script  = read_script.replace(word , f".{word}")
-                                            
+                                        
+                                        
+                                     
                                 
                                 # 시간 형식 설정 (분.초 형태)
                                     time_format = f"[{minutes:02d}:{seconds:02d}]"
                                 # . 기반이다 보니 문제가 있을 만한 것들을 수정    
-                                    read_script = read_script.replace('U.S.', 'US')
-                                    read_script = read_script.replace('U.S', 'US')
-                                    read_script = read_script.replace('S.E.C.' , 'SEC')
-                                    read_script = read_script.replace('Mr.', 'Mr ')
-                                    read_script = read_script.replace('Mrs.', 'Mrs ')
+                                    replacements = {
+                                        'U.S.': 'US',
+                                        'U.S': 'US',
+                                        'S.E.C.': 'SEC',
+                                        'Mr.': 'Mr ',
+                                        'Mrs.': 'Mrs ',
+                                        'Ph.D.': 'PhD ',
+                                        'Prof.': 'prof ',
+                                        'Dr.': 'Dr ',
+                                        'No.': 'Number ',
+                                        'a.m.': 'am',
+                                        'p.m.': 'pm',
+                                        '.com': '(dot)com',
+                                        '.site': '(dot)site'
+                                    }
 
-                                    read_script = read_script.replace('Ph.D.', 'ph,D ')
-                                    read_script = read_script.replace('Prof.', 'prof ')
-                                    read_script = read_script.replace('Dr.', 'Dr ')
-
-                                    read_script = read_script.replace('No.', 'Number ')
-                                    
-                                    read_script = read_script.replace('a.m.', 'am')
-                                    read_script = read_script.replace('p.m.', 'pm')
+                                    # 치환 반복 적용
+                                    for old, new in replacements.items():
+                                        read_script = read_script.replace(old, new)
                                     
                                     read_script = re.sub(r'(\d)\.(\d)', r'\1 point \2', read_script)
 
@@ -1429,7 +1437,7 @@ else:
                                     read_script = read_script.replace('..' , ".")
                                     read_script = read_script.replace('..' , ".")
                                     read_script = read_script.replace('..' , ".") 
-                                    #read_script = read_script.replace('. >>' , ".")
+                                    
 
                                     read_script = read_script.replace('\n', ' ')
                                     read_script = read_script.replace('.', '. \n')
@@ -1439,9 +1447,14 @@ else:
                                     if UporLow  == False:
                                             read_script = read_script[0].upper() + read_script[1:].lower()
 
+                                            
+ 
                                     new_script += ' '
                                     new_script += time_format
                                     new_script += read_script
+
+                                      
+                                         
 
                                 
                             result_want_transcript =  ["\n\n"]
@@ -1472,8 +1485,65 @@ else:
                                         return cleaned_texts.strip()  # 최종 문자열 반환
 
                             result_want_script = new_script.splitlines()
+                            
+                            
+                            result_if_too_Long = ""
+                            
+                            if dot_Check == False and want_language == "English":
+                                for line in result_want_script:
+                                    if len(line) > 230:
+                                        keywords = ["and ", "but ", "there ", "if ", "do "]
+                                        start = 0  # 검색 시작 위치
+                                    
+                                    
+                                    
+                                    while start < len(line):  # 줄 끝까지 처리
+                                        # 각 키워드의 위치 찾기
+                                        # index_list = [line.find(word, start) for word in keywords]
+                                        # index_list = [i for i in index_list if i != -1]  # -1 값 제거
+                                        index_list = [line.find(word, start) for word in keywords]
+                                        index_list = [i for i in index_list if i != -1] 
+                                        # 키워드가 없는 경우 종료
+                                        if not index_list:
+                                            break
 
+                                        # 각 index에 대해 처리
+                                        found_valid = False  # 조건을 충족하는 키워드가 있는지 확인하는 변수
+                                        for index in index_list:
+                                        
+                                            dot_index = len(line)  # "."이 없으면, 줄 끝까지 처리
+                                            
+                                            # 조건 확인
+                                            if len(line[start:index]) >= 100 and len(line[index:dot_index]) >= 100:
+                                                # 키워드 앞에 ".\n" 추가
+                                                word = next(word for word in keywords if line.find(word, start) == index)
+                                                line = line[:index] + f".\n{word}" + line[index + len(word):]
+                                               
+                                                # `start`를 삽입 후 위치로 업데이트
+                                                start = index + len(f".\n{word}")
+                                                found_valid = True
+                                                break
+                                                 
+
+                                        # 조건을 만족하는 키워드가 없으면 start를 다음 위치로 업데이트
+                                        if not found_valid:
+                                            start = index + 1
+                                             
+                                           
+                            
+
+                                        # 변환된 줄을 결과에 추가
+                                    result_if_too_Long += line
+                                    result_if_too_Long += "\n"
+
+                            # 결과 확인
+                            
+                           
+                                #display_chat_message("assistant" , result_if_too_Long)
+                                result_want_script = result_if_too_Long.splitlines()
+                   
                             for line in  result_want_script:
+                            
                                     result_want_transcript.append("\n")
                                     result_want_transcript.append(clean_transcript_texts([line]))
                                     result_want_transcript.append("\n")    
@@ -1656,7 +1726,7 @@ else:
                             # 유사도가 가장 높은 문장끼리 매칭
                             merged_lines = ["\n\n\n"]
                             used_korean_indices = set() # 사용한 한국어는 지우기 위해 집합 사용
-
+            
                             for eng_idx, eng_sentence in enumerate(english_lines):
                                 # 각 영어 문장에 대해 가장 유사한 한글 문장을 찾음
                                 if not eng_sentence.strip():
@@ -1671,6 +1741,7 @@ else:
                                     for j in range(len(gemini_lines)):
                                             if time_str in gemini_lines[j]:  # time_str이 adw[j]에 있는지 확인
                                                 kor_sentence = gemini_lines[j]
+                                               
                                             else:
                                                 best_kor_idx = np.argmax(similarity_matrix[eng_idx])
                                                 best_kor_similarity = similarity_matrix[eng_idx, best_kor_idx]             
@@ -1683,9 +1754,14 @@ else:
                                     
                                                 kor_sentence = re.sub(r'\[\d{2}:\d{2}\]','', kor_sentence)
                                
-                                else:
+                                else: 
                                     best_kor_idx = np.argmax(similarity_matrix[eng_idx])
+                                    
                                     best_kor_similarity = similarity_matrix[eng_idx, best_kor_idx]             
+                                    
+                                    if best_kor_similarity < 0.5:
+                                        kor_sentence = " "
+                                        pass
 
                                     if best_kor_idx not in used_korean_indices:
                                                         
@@ -1694,22 +1770,43 @@ else:
                                     used_korean_indices.add(best_kor_idx)
                         
                                     kor_sentence = re.sub(r'\[\d{2}:\d{2}\]','', kor_sentence)
-                    
-                                    
+                                
+                        
+                                                
+                                        
                                 merged_lines.append(eng_sentence)
                                 merged_lines.append("\n\n")
                                 merged_lines.append(kor_sentence)
-                                
+
                                 if time_judge:  # time_judge가 None이 아닐 때
                                     time_str = time_judge.group(0) 
                                     for j in range(len(adw_script)):
-                                        if time_str in adw_script[j]:  # time_str이 adw[j]에 있는지 확인
-                                            merged_lines.append("\n")
-                                            merged_lines.append(adw_script[j].replace(time_str,""))
-                                                
+                                        if time_str in adw_script[j]:
+                                            adw_replace_time = adw_script[j].replace(time_str,"")
+                                            adw_index = adw_replace_time.find(":") 
+                                            if adw_script[j].find(adw_replace_time[2:adw_index]):
+                                                merged_lines.append("\n")
+                                                merged_lines.append(adw_script[j].replace(time_str,""))
+                                                 
                                     merged_lines.append("\n\n")      
                                 else:
                                     merged_lines.append("\n")
+                                                
+                                #시간 인덱스 말고 단어 인덱스로 변환하였음 제미니에 들어가고 시간 오류가 가끔 나는 경우가 있었음
+                                # if time_judge:  # time_judge가 None이 아닐 때
+                                #     time_str = time_judge.group(0) 
+                                #     for j in range(len(adw_script)):
+                                #         if time_str in adw_script[j]:  # time_str이 adw[j]에 있는지 확인
+                                #             merged_lines.append("\n")
+                                #             merged_lines.append(adw_script[j].replace(time_str,""))
+                                                
+                                #     merged_lines.append("\n\n")      
+                                # else:
+                                #     merged_lines.append("\n")
+
+                                
+                            
+                                  
                               
                             merged_en_ko_script = "".join(merged_lines)
 
@@ -1750,7 +1847,7 @@ else:
                             
             except Exception as e:
                 # list_available_languages에서 에러가 발생하면 처리
-                st.warning(f"YouTube subtitles access is restricted. Please choose another video")
+                st.warning(f"YouTube subtitles access is restricted. Please choose another video{e}")
     except Exception as e:
         # transcript_list 초기화에서 에러가 발생하면 처리
          st.warning(f"YouTube subtitles access is restricted. Please choose another video.")
