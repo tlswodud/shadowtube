@@ -1492,7 +1492,7 @@ else:
                             #if dot_Check == False and want_language == "English":
                             for line in result_want_script:
                                 if len(line) > 230:
-                                    keywords = ["and ", "but ", "there ", "if ", "do ","it " ,"he ","what ","you ","she ","that ","they" ]
+                                    keywords = ["and ", "but ", "there ", "if ", "do ","it " ,"he ","what","you","she","that","they" ]
                                     start = 0  # 검색 시작 위치
                                 
                                 
@@ -1707,19 +1707,19 @@ else:
 
                             gemini_lines = gemini_transcript.splitlines()  # splitlines()로 리스트 생성
                             korean_lines = kor_script_line
-                            #display_chat_message("assistant",gemini_lines)
+                            display_chat_message("assistant",gemini_lines)
                             # 문장 임베딩 모델 로드 (다국어 지원 모델 사용)
                             #model_similarity = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
                             # 파일 읽기 리스트화 하였습니다
                             
 
                             # 문장 임베딩 모델 로드 (다국어 지원 모델 사용)
-                            model_simul = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
+                            #model_simul = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
                             #model_simul = SentenceTransformer('paraphrase-xlm-r-multilingual-v1')
                             
                             # 영어와 한글 문장의 임베딩 벡터 생성 # 임베딩 생성
                             # 문장 임베딩 모델 로드 (도커 컨테이너 내부 경로에서 로드)
-                            #model_simul = SentenceTransformer('/app/model/sentence_transformer')
+                            model_simul = SentenceTransformer('/app/model/sentence_transformer')
                             english_embeddings = model_simul.encode(english_lines)
                             korean_embeddings = model_simul.encode(korean_lines)
 
@@ -1729,7 +1729,7 @@ else:
                             # 유사도가 가장 높은 문장끼리 매칭
                             merged_lines = ["\n\n\n"]
                             used_korean_indices = set() # 사용한 한국어는 지우기 위해 집합 사용
-
+                            used_indices = set()
                             for eng_idx, eng_sentence in enumerate(english_lines):
                                 # 각 영어 문장에 대해 가장 유사한 한글 문장을 찾음
                                 if not eng_sentence.strip():
@@ -1739,23 +1739,19 @@ else:
                                 
                                 if time_judge:  # time_judge가 None이 아닐 때
                                     time_str = time_judge.group(0) 
-
-                                
-                                    for j in range(len(gemini_lines)):
-                                            if time_str in gemini_lines[j]:  # time_str이 adw[j]에 있는지 확인
-                                                kor_sentence = gemini_lines[j]
-                                            else:
-                                                best_kor_idx = np.argmax(similarity_matrix[eng_idx])
-                                                best_kor_similarity = similarity_matrix[eng_idx, best_kor_idx]             
-
-                                                if best_kor_idx not in used_korean_indices:
-                                                                    
-                                                        kor_sentence = korean_lines[best_kor_idx]
-
-                                                used_korean_indices.add(best_kor_idx)
                                     
-                                            kor_sentence = re.sub(r'\[\d{2}:\d{2}\]','', kor_sentence)
-                               
+                                
+                                    for j,gemini_line in enumerate(gemini_lines):
+                                            if j in used_indices:
+                                                 continue
+                                                      
+                                            if time_str in gemini_line:  # time_str이 adw[j]에 있는지 확인
+                                                kor_sentence = gemini_line
+                                                kor_sentence = re.sub(r'\[\d{2}:\d{2}\]','', kor_sentence)
+                                                used_indices.add(j)
+                                                break
+                                            
+                                              
                                 else:
                                     best_kor_idx = np.argmax(similarity_matrix[eng_idx])
                                     best_kor_similarity = similarity_matrix[eng_idx, best_kor_idx]             
