@@ -1386,7 +1386,7 @@ else:
                                     if dot_Check == False and want_language  == "English": # 영어 일때만 문장 구분 
                                         #display_chat_message("assistant", dot_Check)
                                             # 문장 구분이 필요한 단어 리스트
-                                        keywords = [
+                                        keyword = [
                                         "I ", "And ", "But ", "Now ", "What", "How", "Have", "Did", "In ", 
                                         "Then", "Or", "Why", "Yes", "If ", "When", "Because", 
                                         "Well", "Oh ", "Ah  ", "Okay", "Alright", 
@@ -1402,7 +1402,7 @@ else:
                                          "There " ,""
                                         "To summarize" 
                                     ]
-                                        for word in keywords:
+                                        for word in keyword:
                                             read_script  = read_script.replace(word , f".{word}")
                                         
                                         
@@ -1492,7 +1492,7 @@ else:
                             #if dot_Check == False and want_language == "English":
                             for line in result_want_script:
                                 if len(line) > 230:
-                                    keywords = ["and ", "but ", "there ", "if ", "do ","it " ,"he ","what","you","she","that","they" ]
+                                    keywords = ["and ", "but ", "there ", "if ", "do ","it " ,"he ","what","you","she","that","they","how"]
                                     start = 0  # 검색 시작 위치
                                 
                                 
@@ -1521,7 +1521,7 @@ else:
                                             word = next(word for word in keywords if line.find(word, start) == index)
                                             line = line[:index] + f".\n{word}" + line[index + len(word):]
                                             lines = f".\n{word}" + line[index + len(word):]
-                                            #display_chat_message("assistant", f"{word} :  {lines}")
+                                            
 
                                             # `start`를 삽입 후 위치로 업데이트
                                             start = index + len(f".\n{word}")
@@ -1543,19 +1543,53 @@ else:
                             
                                 #display_chat_message("assistant" , result_if_too_Long)
                                 result_want_script = result_if_too_Long.splitlines()
-                           
+                            
+                            non_time_line_last = ""
+                            non_time_check_last = True
                             for line in  result_want_script:
                                     
-                                    result_want_transcript.append("\n")
-                                    result_want_transcript.append(clean_transcript_texts([line]))
-                                    result_want_transcript.append("\n")    
+                                    time_judge = re.search(r"\[(\d{2}:\d{2})\]", line)
+
+                                    if time_judge:
+                                        if non_time_check_last == False:
+                                             non_time_line_last += line
+                                             line = non_time_line_last
+                                             non_time_line_last=""
+                                             non_time_check_last = True
+
+                                        result_want_transcript.append("\n")
+                                        result_want_transcript.append(clean_transcript_texts([line]))
+                                        result_want_transcript.append("\n")   
+                                    else:
+                                        non_time_line_last = line
+                                        non_time_check_last = False
+
+                                    # result_want_transcript.append("\n")
+                                    # result_want_transcript.append(clean_transcript_texts([line]))
+                                    # result_want_transcript.append("\n")    
 
                             result_only_want_for_word = ["\n\n\n"]
-                            
+                            non_time_line = ""
+                            non_time_check = True
                             for line in  result_want_script:
                                     
-                                    result_only_want_for_word.append(clean_transcript_texts([line]))
-                                    result_only_want_for_word.append("\n")
+                                    # result_only_want_for_word.append(clean_transcript_texts([line]))
+                                    # result_only_want_for_word.append("\n")
+                                    time_judge = re.search(r"\[(\d{2}:\d{2})\]", line)
+
+                                    if time_judge:
+                                        if non_time_check == False:
+                                             non_time_line += line
+                                             line = non_time_line
+                                             non_time_line=""
+                                             non_time_check = True
+
+                                        result_only_want_for_word.append(clean_transcript_texts([line]))
+                                        result_only_want_for_word.append("\n")
+                                    else:
+                                        non_time_line = line
+                                        non_time_check = False
+
                                                
                             
                             word_file = create_word_file_shadow_script(result_only_want_for_word,title_video,learn_code,want_font,native_font,font_size)
@@ -1707,24 +1741,22 @@ else:
 
                             gemini_lines = gemini_transcript.splitlines()  # splitlines()로 리스트 생성
                             korean_lines = kor_script_line
-                            display_chat_message("assistant",gemini_lines)
-                            # 문장 임베딩 모델 로드 (다국어 지원 모델 사용)
-                            #model_similarity = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
-                            # 파일 읽기 리스트화 하였습니다
                             
-
+                          
+                            #유사도기반 없엠 클라우드 비용이 높고 , 제미니 시간 에러 적고 해결하였음     
+                        
                             # 문장 임베딩 모델 로드 (다국어 지원 모델 사용)
-                            #model_simul = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
-                            #model_simul = SentenceTransformer('paraphrase-xlm-r-multilingual-v1')
+                            # model_simul = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
+                            # #model_simul = SentenceTransformer('paraphrase-xlm-r-multilingual-v1')
                             
-                            # 영어와 한글 문장의 임베딩 벡터 생성 # 임베딩 생성
-                            # 문장 임베딩 모델 로드 (도커 컨테이너 내부 경로에서 로드)
-                            model_simul = SentenceTransformer('/app/model/sentence_transformer')
-                            english_embeddings = model_simul.encode(english_lines)
-                            korean_embeddings = model_simul.encode(korean_lines)
+                            # # 영어와 한글 문장의 임베딩 벡터 생성 # 임베딩 생성
+                            # # 문장 임베딩 모델 로드 (도커 컨테이너 내부 경로에서 로드)
+                            # #model_simul = SentenceTransformer('/app/model/sentence_transformer')
+                            # english_embeddings = model_simul.encode(english_lines)
+                            # korean_embeddings = model_simul.encode(korean_lines)
 
                             # 유사도 매트릭스 계산
-                            similarity_matrix = cosine_similarity(english_embeddings, korean_embeddings) 
+                            #similarity_matrix = cosine_similarity(english_embeddings, korean_embeddings) 
 
                             # 유사도가 가장 높은 문장끼리 매칭
                             merged_lines = ["\n\n\n"]
@@ -1753,16 +1785,16 @@ else:
                                             
                                               
                                 else:
-                                    best_kor_idx = np.argmax(similarity_matrix[eng_idx])
-                                    best_kor_similarity = similarity_matrix[eng_idx, best_kor_idx]             
+                                    # best_kor_idx = np.argmax(similarity_matrix[eng_idx])
+                                    # best_kor_similarity = similarity_matrix[eng_idx, best_kor_idx]             
 
-                                    if best_kor_idx not in used_korean_indices:
+                                    # if best_kor_idx not in used_korean_indices:
                                                         
-                                            kor_sentence = korean_lines[best_kor_idx]
+                                    #         kor_sentence = korean_lines[best_kor_idx]
 
-                                    used_korean_indices.add(best_kor_idx)
+                                    # used_korean_indices.add(best_kor_idx)
                         
-                                    kor_sentence = re.sub(r'\[\d{2}:\d{2}\]','', kor_sentence)
+                                    kor_sentence = ""
                     
                                         
                                 merged_lines.append(eng_sentence)

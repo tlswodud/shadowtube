@@ -12,12 +12,13 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt --root-user-action=ignore
 
+#모델 사용 폐지
 # 모델 저장을 위한 디렉토리 생성
-RUN mkdir -p /app/model && chmod 777 /app/model
+# RUN mkdir -p /app/model && chmod 777 /app/model
 
-# 모델 다운로드 스크립트 복사 및 실행
-COPY model_download.py /app/model_download.py
-RUN python /app/model_download.py
+# # 모델 다운로드 스크립트 복사 및 실행
+# COPY model_download.py /app/model_download.py
+# RUN python /app/model_download.py
 
 # 로고 이미지
 COPY ./image/shadowLogo2.png /app/image/shadowLogo2.png
