@@ -155,8 +155,7 @@ def create_modern_ui():
         2. Select your native language
         3. Choose the language you want to learn
         4. Paste a YouTube URL
-        5. Click 'Generate' to create your learning materials
-        6. 쿠팡 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.            
+        5. Click 'Generate' to create your learning materials     
         """)
     return url ,  native_language  ,target_language
 
@@ -455,9 +454,7 @@ def get_best_english_transcript_no_time(video_id,_transcript_list):
                     print("영어 자막을 찾을 수 없습니다.")
                     return None
                     
-        # except Exception as e:
-        #     print(f"자막을 가져오는 중 오류가 발생했습니다: {str(e)}")
-        #     return None
+    
 
 
 @st.cache_data
@@ -640,7 +637,7 @@ def get_best_learn_code(video_id , learn_code, _transcript_list):
 user_input= url
 video_id = get_video_id(user_input)
 
-#title_video = get_video_title(video_id)
+
 
 
 def target_translate_isavailable(video_id):
@@ -1867,7 +1864,7 @@ else:
                             st.balloons()
                             
                             st.markdown("""<a href="https://link.coupang.com/a/b2LEz4" target="_blank" referrerpolicy="unsafe-url"><img src="https://ads-partners.coupang.com/banners/823313?subId=&traceId=V0-301-50c6c2b97fba9aee-I823313&w=728&h=90" alt=""></a>""",unsafe_allow_html=True)
-                            
+                            st.markdown("assistant", "해당 서비스는 쿠팡 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.")
             except Exception as e:
                 # list_available_languages에서 에러가 발생하면 처리
                 st.warning(f"YouTube subtitles access is restricted. Please choose another video{e}")
