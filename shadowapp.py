@@ -343,15 +343,18 @@ import streamlit as st
 @st.cache_data
 def get_best_english_transcript(video_id,_transcript_list):
         # 선호하는 영어 자막 코드 목록
-        english_codes = ['en-US', 'en-GB', 'en-CA', 'en-AU', 'en', 'a.en']
+
+        # 수동이 더 좋다? 영어는 또 그렇지 않았다
+         #find_generated_transcript < - >  find_manually_created_transcript 로 변환 
+        #뉴스 방송사들은 수동자막이 더 이상함 또한 자동 자막의 퀄이 영어는 너무 좋다
+
+        english_codes = [ 'en','en-US', 'en-GB', 'en-CA', 'en-AU', 'a.en']
         
         try:
-            #transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-            
+        
             # 1. 먼저 수동 생성된 영어 자막 찾기 (모든 영어 변형 시도)
             try:
-                
-                transcript = _transcript_list.find_manually_created_transcript(english_codes)
+                transcript = _transcript_list.find_generated_transcript(english_codes)
                 print(f"수동 생성된 영어 자막을 찾았습니다. (언어 코드: {transcript.language_code})")
                 result = [(entry['start'], entry['text']) for entry in transcript.fetch()]
                 return result
@@ -359,7 +362,7 @@ def get_best_english_transcript(video_id,_transcript_list):
             except:
                 # 2. 수동 자막이 없을 경우, 자동 생성된 영어 자막 찾기
                 try:
-                    transcript = _transcript_list.find_generated_transcript(english_codes)
+                    transcript = _transcript_list.find_manually_created_transcript(english_codes)
                     print(f"자동 생성된 영어 자막을 찾았습니다. (언어 코드: {transcript.language_code})")
                     result = [(entry['start'], entry['text']) for entry in transcript.fetch()]
                     return result
@@ -421,15 +424,15 @@ def get_best_english_encode(video_id,_transcript_list):
 @st.cache_data
 def get_best_english_transcript_no_time(video_id,_transcript_list):
         # 선호하는 영어 자막 코드 목록
-            english_codes = ['en-US', 'en-GB', 'en-CA', 'en-AU', 'en', 'a.en']
-        
-        #try:
-            #transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-            
-            # 1. 먼저 수동 생성된 영어 ��막 찾기 (모든 영어 변형 시도)
+            english_codes = ['en','en-US', 'en-GB', 'en-CA', 'en-AU', 'a.en']
+                    
+            # 1. 먼저 수동 생성된 영어 자막 찾기 (모든 영어 변형 시도) - >
+            # 수동이 더 좋다? 영어는 또 그렇지 않았다
             try:
-                
-                transcript = _transcript_list.find_manually_created_transcript(english_codes)
+                #find_generated_transcript < - >  find_manually_created_transcript 로 변환 
+                #뉴스 방송사들은 수동자막이 더 이상함 
+
+                transcript = _transcript_list.find_generated_transcript(english_codes)
                 print(f"수동 생성된 영어 자막을 찾았습니다. (언어 코드: {transcript.language_code})")
                 result = [(entry['text']) for entry in transcript.fetch()]
                 return result
@@ -437,7 +440,7 @@ def get_best_english_transcript_no_time(video_id,_transcript_list):
             except:
                 # 2. 수동 자막이 없을 경우, 자동 생성된 영어 자막 찾기
                 try:
-                    transcript = _transcript_list.find_generated_transcript(english_codes)
+                    transcript = _transcript_list.find_manually_created_transcript(english_codes)
                     print(f"자동 생성된 영어 자막을 찾았습니다. (언어 코드: {transcript.language_code})")
                     result = [(entry['text']) for entry in transcript.fetch()]
                     return result
@@ -532,6 +535,8 @@ def get_best_want_no_time(video_id ,learn_code,_transcript_list):
         except Exception as e:
             print(f"자막을 가져오는 중 오류가 발생했습니다: {str(e)}")
             return None
+
+# 구글 자막을 이용해서 제미니 API가 단시간 반복 사용될때 생기는 오류를 보완하고자 하였다 하지만 해결해서 사용안함        
 @st.cache_data
 def get_best_to_translate_target(video_id,native_code,_transcript_list):
             
@@ -640,15 +645,6 @@ video_id = get_video_id(user_input)
 
 
 
-def target_translate_isavailable(video_id):
-    #transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-
-    for transcript in transcript_list:
-        transcript.is_translatable
-        print("한국어 번역 자막 사용가능합니다")
-        return transcript.is_translatable
-
-
 def contains_lowercase(eng_script_no_time):
         """소문자 포함 여부 확인"""      
         return any(c.islower() for c in eng_script_no_time)
@@ -659,6 +655,7 @@ def check_dot(eng_script):
     ja_dot_count = sum(text.count('。') for text in eng_script)
     # 마침표가 5개 이하라면 False, 그렇지 않으면 True 반환
     return dot_count > 5 or ja_dot_count > 5
+
 @st.cache_data
 def gemini_check_advanced_word_im_japan(_model, result_eng_transcript, generation_config):
     """
@@ -1320,9 +1317,7 @@ else:
             display_chat_message("google Ban this service...Really?")
         
         print("api_work")
-        
-       
-                            
+                                   
         # 채팅 처리
         if user_input:
             # 사용자 메시지 표시
@@ -1369,8 +1364,7 @@ else:
                                     #display_chat_message("assistant", "There are no delimiters. This service analyzes sentences using delimiters such as (.) and (?). Please select a different video.")
                                     st.warning("There are no delimiters. This service analyzes sentences using delimiters such as (.) and (?). Please select a different video.")
                                     st.stop()
-                        
-                            
+                    
                             
                             import re 
 
@@ -1451,12 +1445,8 @@ else:
                                     new_script += read_script
 
                                       
-                                         
-
-                                
                             result_want_transcript =  ["\n\n"]
 
-                            #to_timestamps_list = []
                           
 
                             # 타임스탬프 맨앞 빼고 제거 함수
@@ -1467,10 +1457,9 @@ else:
                                             # 1) 모든 타임스탬프를 찾음
                                             timestamps = re.findall(r'\[\d{2}:\d{2}\]', text)
                                             
-                                            if timestamps:
-                                                # 2) 첫 번째 타임스탬프만 남기고  리스트에 to_time  에 넣어주었음 나중에 앞에 붙일거
+                                            if timestamps:      
                                                 first_timestamp = timestamps[0]
-                                                #to_timestamps_list.append(first_timestamp)
+
                                                 cleaned_text = text.replace(first_timestamp, '',1)
                                                 cleaned_text = re.sub(r'\[\d{2}:\d{2}\]','', cleaned_text)  # 나머지 타임스탬프 제거
                                                 cleaned_texts += first_timestamp +" "+ cleaned_text.strip() +" "
@@ -1489,7 +1478,7 @@ else:
                             #if dot_Check == False and want_language == "English":
                             for line in result_want_script:
                                 if len(line) > 230:
-                                    keywords = ["and ", "but ", "there ", "if ", "do ","it " ,"he ","what","you","she","that","they","how"]
+                                    keywords = ["and ", "but ", "there", "if ", "do ","it " ,"he ","what","you","she","that","they","how","or ",]
                                     start = 0  # 검색 시작 위치
                                 
                                 
@@ -1530,8 +1519,7 @@ else:
                                     if found_valid ==  False:
                                         start = index + 1
 
-                                        
-                                            
+                                    
                                     # 변환된 줄을 결과에 추가
                                 result_if_too_Long += line
                                 result_if_too_Long += "\n"
@@ -1553,10 +1541,10 @@ else:
                                              line = non_time_line_last
                                              non_time_line_last=""
                                              non_time_check_last = True
-
-                                        result_want_transcript.append("\n")
-                                        result_want_transcript.append(clean_transcript_texts([line]))
-                                        result_want_transcript.append("\n")   
+                                        else:
+                                            result_want_transcript.append("\n")
+                                            result_want_transcript.append(clean_transcript_texts([line]))
+                                            result_want_transcript.append("\n")   
                                     else:
                                         non_time_line_last = line
                                         non_time_check_last = False
@@ -1567,62 +1555,59 @@ else:
 
                             result_only_want_for_word = ["\n\n\n"]
                             non_time_line = ""
-                            non_time_check = True
-                            for line in  result_want_script:
-                                    
-                                    # result_only_want_for_word.append(clean_transcript_texts([line]))
-                                    # result_only_want_for_word.append("\n")
-                                    time_judge = re.search(r"\[(\d{2}:\d{2})\]", line)
 
-                                    if time_judge:
-                                        if non_time_check == False:
-                                             non_time_line += line
-                                             line = non_time_line
-                                             non_time_line=""
-                                             non_time_check = True
+                            for line in result_want_script:
+                                time_judge = re.search(r"\[(\d{2}:\d{2})\]", line)
 
+                                if time_judge:
+                                    if non_time_line:  # non_time_line이 비어있지 않으면
+                                        line  = non_time_line + line
+                                        result_only_want_for_word.append(clean_transcript_texts([non_time_line]))
+                                        result_only_want_for_word.append("\n")
+                                        non_time_line = ""  # non_time_line 초기화
+                                    else:  
                                         result_only_want_for_word.append(clean_transcript_texts([line]))
                                         result_only_want_for_word.append("\n")
-                                    else:
-                                        non_time_line = line
-                                        non_time_check = False
-
+                                else:
+                                    non_time_line = line  # 현재 줄을 non_time_line에 저장
                                                
                             
                             word_file = create_word_file_shadow_script(result_only_want_for_word,title_video,learn_code,want_font,native_font,font_size)
                             
     
-                            
-                            result_target_script =  get_best_to_translate_target(video_id ,native_code,transcript_list) 
-                            new_target_script = ""
+                            #유사도 기반 아이디어를 삭제 하였음
+                            #처음에는 artifact 저장소의 비용을 줄이고자 해서 삭제했지만 새로 수정한 버전이 좋은 성능을 보임
 
-                            for read_script_target_line in result_target_script:
+                            # result_target_script =  get_best_to_translate_target(video_id ,native_code,transcript_list) 
+                            # new_target_script = ""
+
+                            # for read_script_target_line in result_target_script:
                                     
-                                    read_script_target_line = read_script_target_line.replace('U.S.', 'US')
-                                    read_script_target_line = read_script_target_line.replace('U.S', 'US')
-                                    read_script_target_line = read_script_target_line.replace('S.E.C.' , 'SEC')
-                                    read_script_target_line = read_script_target_line.replace('Mr.', 'Mr ')
-                                    read_script_target_line = read_script_target_line.replace('Mrs.', 'Mrs ')
+                            #         read_script_target_line = read_script_target_line.replace('U.S.', 'US')
+                            #         read_script_target_line = read_script_target_line.replace('U.S', 'US')
+                            #         read_script_target_line = read_script_target_line.replace('S.E.C.' , 'SEC')
+                            #         read_script_target_line = read_script_target_line.replace('Mr.', 'Mr ')
+                            #         read_script_target_line = read_script_target_line.replace('Mrs.', 'Mrs ')
 
-                                    read_script_target_line = read_script_target_line.replace('Ph.D.', 'ph,D ')
-                                    read_script_target_line = read_script_target_line.replace('Prof.', 'prof ')
-                                    read_script_target_line = read_script_target_line.replace('Dr.', 'Dr ')
+                            #         read_script_target_line = read_script_target_line.replace('Ph.D.', 'ph,D ')
+                            #         read_script_target_line = read_script_target_line.replace('Prof.', 'prof ')
+                            #         read_script_target_line = read_script_target_line.replace('Dr.', 'Dr ')
 
-                                    read_script_target_line = read_script_target_line.replace('No.', 'Number')
-                                    read_script_target_line = read_script_target_line.replace('a.m.', 'am')
-                                    read_script_target_line= read_script_target_line.replace('p.m.', 'pm')
+                            #         read_script_target_line = read_script_target_line.replace('No.', 'Number')
+                            #         read_script_target_line = read_script_target_line.replace('a.m.', 'am')
+                            #         read_script_target_line= read_script_target_line.replace('p.m.', 'pm')
 
-                                    read_script_target_line = read_script_target_line.replace('\n', ' ')
-                                    read_script_target_line = read_script_target_line.replace('.', '. \n')
-                                    read_script_target_line = read_script_target_line.replace('。', '。 \n')
-                                    read_script_target_line = read_script_target_line.replace('?' , '? \n')
+                            #         read_script_target_line = read_script_target_line.replace('\n', ' ')
+                            #         read_script_target_line = read_script_target_line.replace('.', '. \n')
+                            #         read_script_target_line = read_script_target_line.replace('。', '。 \n')
+                            #         read_script_target_line = read_script_target_line.replace('?' , '? \n')
                                     
                                     
-                                    new_target_script +=' '
-                                    new_target_script += read_script_target_line
+                            #         new_target_script +=' '
+                            #         new_target_script += read_script_target_line
                             
                             
-                            kor_script_line = new_target_script.splitlines()
+                            # kor_script_line = new_target_script.splitlines()
                             
                             import google.generativeai as genai
                                                             
@@ -1725,8 +1710,7 @@ else:
                                         # 최대 재시도 횟수 초과 시 None 반환
                                         print("최대 재시도 횟수를 초과했습니다.")
                                         return None
-                            
-                            #display_chat_message("assistant" , gemini_transcript)
+                    
 
                             from sentence_transformers import SentenceTransformer  # 텍스트 백터 변환
                             from sklearn.metrics.pairwise import cosine_similarity # 벡터 유사도 계산
@@ -1737,11 +1721,11 @@ else:
                             english_lines = result_want_transcript
 
                             gemini_lines = gemini_transcript.splitlines()  # splitlines()로 리스트 생성
-                            korean_lines = kor_script_line
+                           
                             
                           
                             #유사도기반 없엠 클라우드 비용이 높고 , 제미니 시간 에러 적고 해결하였음     
-                        
+                             #korean_lines = kor_script_line
                             # 문장 임베딩 모델 로드 (다국어 지원 모델 사용)
                             # model_simul = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')#paraphrase-xlm-r-multilingual-v1
                             # #model_simul = SentenceTransformer('paraphrase-xlm-r-multilingual-v1')
@@ -1774,7 +1758,7 @@ else:
                                             if j in used_indices:
                                                  continue
                                                       
-                                            if time_str in gemini_line:  # time_str이 adw[j]에 있는지 확인
+                                            if time_str in gemini_line:  
                                                 kor_sentence = gemini_line
                                                 kor_sentence = re.sub(r'\[\d{2}:\d{2}\]','', kor_sentence)
                                                 used_indices.add(j)
@@ -1864,10 +1848,10 @@ else:
                             st.balloons()
                             
                             st.markdown("""<a href="https://link.coupang.com/a/b2LEz4" target="_blank" referrerpolicy="unsafe-url"><img src="https://ads-partners.coupang.com/banners/823313?subId=&traceId=V0-301-50c6c2b97fba9aee-I823313&w=728&h=90" alt=""></a>""",unsafe_allow_html=True)
-                            st.markdown("assistant", "해당 서비스는 쿠팡 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.")
+                            display_chat_message("assistant", "해당 서비스는 쿠팡 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.")
             except Exception as e:
                 # list_available_languages에서 에러가 발생하면 처리
-                st.warning(f"YouTube subtitles access is restricted. Please choose another video{e}")
+                st.warning(f"YouTube subtitles access is restricted. Please choose another video")
     except Exception as e:
         # transcript_list 초기화에서 에러가 발생하면 처리
          st.warning(f"YouTube subtitles access is restricted. Please choose another video.")
