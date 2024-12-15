@@ -1293,9 +1293,9 @@ settings = create_settings_sidebar()
 if not settings["api_key"]:
         st.warning("Please enter the Gemini API key in the sidebar.")
         st.stop()
-st.write(f"- Slected native language font: {settings['native_font']}")
-st.write(f"- Slected target language font: {settings['want_font']}")
-st.write(f"- Font Size: {settings['font_size']}px")
+# st.write(f"- Slected native language font: {settings['native_font']}")
+# st.write(f"- Slected target language font: {settings['want_font']}")
+# st.write(f"- Font Size: {settings['font_size']}px")
 
 native_font = settings['native_font']
 want_font = settings['want_font']
@@ -1321,9 +1321,11 @@ else:
         # 채팅 처리
         if user_input:
             # 사용자 메시지 표시
-            st.markdown("""<a href="https://link.coupang.com/a/b2L2wF" target="_blank" referrerpolicy="unsafe-url"><img src="https://ads-partners.coupang.com/banners/823356?subId=&traceId=V0-301-8be2627c04ed5569-I823356&w=728&h=90" alt=""></a>""",unsafe_allow_html=True)
+            st.markdown("""<a href="https://link.coupang.com/a/b4Z0hb" target="_blank" referrerpolicy="unsafe-url">
+                        <img src="https://img4a.coupangcdn.com/image/affiliate/widget/image/2024/11/25/03a1609c92ee009c010ecaed3566ed44.png" 
+                        alt=""style=" margin-bottom:15px"></a>""",unsafe_allow_html=True)
             
-            display_chat_message("user", user_input)
+            #display_chat_message("user", user_input)
 
             # AI 응답 (예시)
             ai_response = "Checking your video... Bot is running!"
@@ -1358,9 +1360,7 @@ else:
                             dot_Check = check_dot(want_lang_no_time)
                         
                             if dot_Check == False:
-                                if want_language  == "English":                                      
-                                    display_chat_message("assistant", "There are no delimiters detected. This service analyzes sentences based on delimiters such as (.) and (?). We’ll try a different way to separate the sentences, but this method might not be as precise.")
-                                else:
+                                if want_language  != "English":                                      
                                     #display_chat_message("assistant", "There are no delimiters. This service analyzes sentences using delimiters such as (.) and (?). Please select a different video.")
                                     st.warning("There are no delimiters. This service analyzes sentences using delimiters such as (.) and (?). Please select a different video.")
                                     st.stop()
@@ -1528,7 +1528,7 @@ else:
                             
                                 #display_chat_message("assistant" , result_if_too_Long)
                                 result_want_script = result_if_too_Long.splitlines()
-                            
+                           
                             non_time_line_last = ""
                             non_time_check_last = True
                             for line in  result_want_script:
@@ -1536,6 +1536,7 @@ else:
                                     time_judge = re.search(r"\[(\d{2}:\d{2})\]", line)
 
                                     if time_judge:
+                                        
                                         if non_time_check_last == False:
                                              non_time_line_last += line
                                              line = non_time_line_last
@@ -1740,6 +1741,7 @@ else:
                             #similarity_matrix = cosine_similarity(english_embeddings, korean_embeddings) 
 
                             # 유사도가 가장 높은 문장끼리 매칭
+                            time_list  = []
                             merged_lines = ["\n\n\n"]
                             used_korean_indices = set() # 사용한 한국어는 지우기 위해 집합 사용
                             used_indices = set()
@@ -1753,7 +1755,8 @@ else:
                                 if time_judge:  # time_judge가 None이 아닐 때
                                     time_str = time_judge.group(0) 
                                     
-                                
+                                    time_list.append(time_str)
+                                    
                                     for j,gemini_line in enumerate(gemini_lines):
                                             if j in used_indices:
                                                  continue
@@ -1808,8 +1811,8 @@ else:
                                 # else:
                                 #     merged_lines.append("\n")
 
-                                
-                            
+                            display_chat_message("assistant","If you add this timestamp to the YouTube comments, it will make studying easier.")    
+                            display_chat_message("assistant", time_list)
                                   
                               
                             merged_en_ko_script = "".join(merged_lines)
@@ -1847,7 +1850,10 @@ else:
                             #display_chat_message("assistant","I've completed it! Expand your world!")
                             st.balloons()
                             
-                            st.markdown("""<a href="https://link.coupang.com/a/b2LEz4" target="_blank" referrerpolicy="unsafe-url"><img src="https://ads-partners.coupang.com/banners/823313?subId=&traceId=V0-301-50c6c2b97fba9aee-I823313&w=728&h=90" alt=""></a>""",unsafe_allow_html=True)
+                            st.markdown("""
+                            <iframe src="https://ads-partners.coupang.com/widgets.html?id=823342&template=carousel&trackingCode=AF4610152&subId=&width=680&height=120&tsource=" 
+                                    width="680" height="100" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" browsingtopics></iframe>
+                            """, unsafe_allow_html=True)
                             display_chat_message("assistant", "해당 서비스는 쿠팡 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.")
             except Exception as e:
                 # list_available_languages에서 에러가 발생하면 처리
