@@ -1324,7 +1324,7 @@ else:
             st.markdown("""<a href="https://link.coupang.com/a/b4Z0hb" target="_blank" referrerpolicy="unsafe-url">
                         <img src="https://img4a.coupangcdn.com/image/affiliate/widget/image/2024/11/25/03a1609c92ee009c010ecaed3566ed44.png" 
                         alt=""style=" margin-bottom:15px"></a>""",unsafe_allow_html=True)
-            
+           
             #display_chat_message("user", user_input)
 
             # AI 응답 (예시)
@@ -1723,7 +1723,7 @@ else:
 
                             gemini_lines = gemini_transcript.splitlines()  # splitlines()로 리스트 생성
                            
-                            
+                            #display_chat_message("assistant","If you add this timestamp to the YouTube comments, it will make studying easier.")    
                           
                             #유사도기반 없엠 클라우드 비용이 높고 , 제미니 시간 에러 적고 해결하였음     
                              #korean_lines = kor_script_line
@@ -1780,7 +1780,8 @@ else:
                         
                                     kor_sentence = ""
                     
-                                        
+
+
                                 merged_lines.append(eng_sentence)
                                 merged_lines.append("\n\n")
                                 merged_lines.append(kor_sentence)
@@ -1798,7 +1799,9 @@ else:
                                     merged_lines.append("\n\n")      
                                 else:
                                     merged_lines.append("\n")
-                                                
+                                               
+                           
+                                   
                                 #시간 인덱스 말고 단어 인덱스로 변환하였음 제미니에 들어가고 시간 오류가 가끔 나는 경우가 있었음
                                 # if time_judge:  # time_judge가 None이 아닐 때
                                 #     time_str = time_judge.group(0) 
@@ -1812,9 +1815,7 @@ else:
                                 #     merged_lines.append("\n")
 
                             display_chat_message("assistant","If you add this timestamp to the YouTube comments, it will make studying easier.")    
-                            display_chat_message("assistant", time_list)
-                                  
-                              
+                            display_chat_message("assistant", time_list)  
                             merged_en_ko_script = "".join(merged_lines)
 
                                 
@@ -1850,10 +1851,14 @@ else:
                             #display_chat_message("assistant","I've completed it! Expand your world!")
                             st.balloons()
                             
-                            st.markdown("""
-                            <iframe src="https://ads-partners.coupang.com/widgets.html?id=823342&template=carousel&trackingCode=AF4610152&subId=&width=680&height=120&tsource=" 
-                                    width="680" height="100" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" browsingtopics></iframe>
-                            """, unsafe_allow_html=True)
+                            # st.markdown("""
+                            # <iframe src="https://ads-partners.coupang.com/widgets.html?id=823342&template=carousel&trackingCode=AF4610152&subId=&width=680&height=120&tsource=" 
+                            #         width="680" height="100" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" browsingtopics></iframe>
+                            # """, unsafe_allow_html=True)
+                            st.markdown("""<a href="https://link.coupang.com/a/b40cin" target="_blank" referrerpolicy="unsafe-url">
+                            <img src="https://image11.coupangcdn.com/image/cmg/oms/banner/0ebebf1e-2dc2-423b-933a-3a9f14dac987_980x150.jpg" 
+                            alt=""style=" margin-bottom:15px"></a>""",unsafe_allow_html=True)
+                            
                             display_chat_message("assistant", "해당 서비스는 쿠팡 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.")
             except Exception as e:
                 # list_available_languages에서 에러가 발생하면 처리
