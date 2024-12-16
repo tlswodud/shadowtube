@@ -1814,8 +1814,9 @@ else:
                                 # else:
                                 #     merged_lines.append("\n")
 
-                            display_chat_message("assistant","If you add this timestamp to the YouTube comments, it will make studying easier.")    
-                            display_chat_message("assistant", time_list)  
+                            # display_chat_message("assistant","If you add this timestamp to the YouTube comments, it will make studying easier.")    
+                            # display_chat_message("assistant", time_list)  
+                            merged_lines.insert(0, "\n" + "✨ Adding this timestamp to YouTube comments simplifies studying! :} ✨" + "\n" + str(time_list))
                             merged_en_ko_script = "".join(merged_lines)
 
                                 
@@ -1865,4 +1866,4 @@ else:
                 st.warning(f"YouTube subtitles access is restricted. Please choose another video")
     except Exception as e:
         # transcript_list 초기화에서 에러가 발생하면 처리
-         st.warning(f"YouTube subtitles access is restricted. Please choose another video.")
+         st.warning(f"YouTube subtitles access is restricted. Please choose another video.") 
