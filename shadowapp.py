@@ -657,12 +657,12 @@ def check_dot(eng_script):
     return dot_count > 5 or ja_dot_count > 5
 
 @st.cache_data
-def gemini_check_advanced_word_im_japan(_model, result_eng_transcript, generation_config):
+def gemini_check_advanced_word_im_japan(_model, result_want_transcript, generation_config):
     """
     テキストを一定のサイズに分割し、各部分に対して高度な単語の説明を日本語で生成します。
 
     パラメータ:
-        model: ��デルオブジェクト (API呼び出し用)
+        model: デルオブジェクト (API呼び出し用)
         result_eng_transcript: 全文 (文字列)
         generation_config: 生成設定 (genai.types.GenerationConfig オブジェクト)
         chunk_size: 各チャンクのサイズ (デフォルト: 300)
@@ -671,8 +671,8 @@ def gemini_check_advanced_word_im_japan(_model, result_eng_transcript, generatio
         adw: 高度な単語の説明が含まれるリスト (各項目は文字列)
     """
     # 텍스트를 chunk_size 크기로 분할
-    chunk_size = 300
-    chunks_script = [result_eng_transcript[i:i + chunk_size] for i in range(0, len(result_eng_transcript), chunk_size)]
+    chunk_size = 120
+    chunks_script = [result_want_transcript[i:i + chunk_size] for i in range(0, len(result_want_transcript), chunk_size)]
     response_text = []
 
     for chunk in chunks_script:
@@ -702,7 +702,7 @@ def gemini_check_advanced_word_im_japan(_model, result_eng_transcript, generatio
     
     return advanced_word
 @st.cache_data
-def gemini_check_advanced_word_im_china(_model, result_eng_transcript, generation_config):
+def gemini_check_advanced_word_im_china(_model, result_want_transcript, generation_config):
     """
     将文本按指定大小进行分割，并为每部分生成中国语的高级词汇解释。
 
@@ -716,8 +716,8 @@ def gemini_check_advanced_word_im_china(_model, result_eng_transcript, generatio
         adw: 包含高级词汇解释的列表 (每个项目为字符串)
     """
     # 将文本分割为 chunk_size 大小的块
-    chunk_size = 300
-    chunks_script = [result_eng_transcript[i:i + chunk_size] for i in range(0, len(result_eng_transcript), chunk_size)]
+    chunk_size = 120
+    chunks_script = [result_want_transcript[i:i + chunk_size] for i in range(0, len(result_want_transcript), chunk_size)]
     response_text = []
 
     for chunk in chunks_script:
@@ -748,7 +748,7 @@ def gemini_check_advanced_word_im_china(_model, result_eng_transcript, generatio
     
     return advanced_word
 @st.cache_data     
-def gemini_check_advanced_word_im_fran(_model, result_eng_transcript, generation_config):
+def gemini_check_advanced_word_im_fran(_model, result_want_transcript, generation_config):
     """
     Divise le texte en parties de taille spécifiée et génère des explications en français pour les mots avancés dans chaque partie.
 
@@ -762,8 +762,8 @@ def gemini_check_advanced_word_im_fran(_model, result_eng_transcript, generation
         adw: Liste contenant les explications des mots avancés (chaque élément est une chaîne de caractères)
     """
     # Diviser le texte en morceaux de taille chunk_size
-    chunk_size = 300
-    chunks_script = [result_eng_transcript[i:i + chunk_size] for i in range(0, len(result_eng_transcript), chunk_size)]
+    chunk_size = 120
+    chunks_script = [result_want_transcript[i:i + chunk_size] for i in range(0, len(result_want_transcript), chunk_size)]
     response_text = []
 
     for chunk in chunks_script:
@@ -793,7 +793,7 @@ def gemini_check_advanced_word_im_fran(_model, result_eng_transcript, generation
     
     return advanced_word
 @st.cache_data
-def gemini_check_advanced_word_im_espanol(_model, result_eng_transcript, generation_config):
+def gemini_check_advanced_word_im_espanol(_model, result_want_transcript, generation_config):
     """
     Divide el texto en partes de tamaño especificado y genera explicaciones en español para las palabras avanzadas en cada parte.
 
@@ -807,8 +807,8 @@ def gemini_check_advanced_word_im_espanol(_model, result_eng_transcript, generat
         adw: Lista que contiene explicaciones de palabras avanzadas (cada elemento es una cadena de caracteres)
     """
     # Dividir el texto en fragmentos de tamaño chunk_size
-    chunk_size = 300
-    chunks_script = [result_eng_transcript[i:i + chunk_size] for i in range(0, len(result_eng_transcript), chunk_size)]
+    chunk_size = 120
+    chunks_script = [result_want_transcript[i:i + chunk_size] for i in range(0, len(result_want_transcript), chunk_size)]
     response_text = []
 
     for chunk in chunks_script:
@@ -838,7 +838,7 @@ def gemini_check_advanced_word_im_espanol(_model, result_eng_transcript, generat
     
     return advanced_word
 @st.cache_data
-def gemini_check_advanced_word(_model, result_eng_transcript, generation_config):
+def gemini_check_advanced_word(_model,result_want_transcript, generation_config):
     """
     텍스트를 일정 크기로 분할하고 각 조각에 대해 고급 단어 설명을 생성합니다.
     
@@ -852,8 +852,8 @@ def gemini_check_advanced_word(_model, result_eng_transcript, generation_config)
         adw: 고급 단어 설명이 포함된 리스트 (각 항목은 문자열)
     """
     # 텍스트를 chunk_size 크기로 분할
-    chunk_size = 300 
-    chunks_script = [result_eng_transcript[i:i + chunk_size] for i in range(0, len(result_eng_transcript), chunk_size)]
+    chunk_size = 120 
+    chunks_script = [result_want_transcript[i:i + chunk_size] for i in range(0, len(result_want_transcript), chunk_size)]
     response_text = []
 
     for chunk in chunks_script:
@@ -886,7 +886,7 @@ def gemini_check_advanced_word(_model, result_eng_transcript, generation_config)
     
     return advanced_word 
 @st.cache_data
-def gemini_translate_text(_model, result_eng_transcript, generation_config):
+def gemini_translate_text(_model, result_want_transcript, generation_config):
                                     
     """
     텍스트를 일정 크기로 분할하고 각 조각에 번역을 생성합니다.
@@ -902,7 +902,7 @@ def gemini_translate_text(_model, result_eng_transcript, generation_config):
     """
     # 텍스트를 chunk_size 크기로 분할
     chunk_size= 200
-    chunks_script = [result_eng_transcript[i:i + chunk_size] for i in range(0, len(result_eng_transcript), chunk_size)]
+    chunks_script = [result_want_transcript[i:i + chunk_size] for i in range(0, len(result_want_transcript), chunk_size)]
     response_text = []
 
     for chunk in chunks_script:
@@ -949,7 +949,7 @@ def gemini_translate_text(_model, result_eng_transcript, generation_config):
     
     return translated_text 
 @st.cache_data
-def gemini_translate_text_im_japan(_model, result_eng_transcript, generation_config):
+def gemini_translate_text_im_japan(_model, result_want_transcript, generation_config):
     """
     テキストを一定のサイズに分割し、各部分について翻訳を生成します。
     
@@ -963,8 +963,8 @@ def gemini_translate_text_im_japan(_model, result_eng_transcript, generation_con
         translated_text: 翻訳されたテキストを含む文字列
     """
     # テキストをchunk_sizeの大きさで分割
-    chunk_size = 300
-    chunks_script = [result_eng_transcript[i:i + chunk_size] for i in range(0, len(result_eng_transcript), chunk_size)]
+    chunk_size = 200
+    chunks_script = [result_want_transcript[i:i + chunk_size] for i in range(0, len(result_want_transcript), chunk_size)]
     response_text = []
 
     for chunk in chunks_script:
@@ -1007,7 +1007,7 @@ def gemini_translate_text_im_japan(_model, result_eng_transcript, generation_con
     
     return translated_text
 @st.cache_data
-def gemini_translate_text_im_china(_model, result_eng_transcript, generation_config):
+def gemini_translate_text_im_china(_model,result_want_transcript, generation_config):
     """
     テキストを一定のサイズに分割し、各部分について翻訳を生成します。
     
@@ -1021,8 +1021,8 @@ def gemini_translate_text_im_china(_model, result_eng_transcript, generation_con
         translated_text: 翻訳されたテキストを含む文字列
     """
     # テキストをchunk_sizeの大きさで分割
-    chunk_size = 300
-    chunks_script = [result_eng_transcript[i:i + chunk_size] for i in range(0, len(result_eng_transcript), chunk_size)]
+    chunk_size = 200
+    chunks_script = [result_want_transcript[i:i + chunk_size] for i in range(0, len(result_want_transcript), chunk_size)]
     response_text = []
 
     for chunk in chunks_script:
@@ -1065,7 +1065,7 @@ def gemini_translate_text_im_china(_model, result_eng_transcript, generation_con
     
     return translated_text
 @st.cache_data
-def gemini_translate_text_im_espanol(_model, result_eng_transcript, generation_config):
+def gemini_translate_text_im_espanol(_model, result_want_transcript, generation_config):
 
     """
     Divide el texto en partes de un tamaño específico y genera la traducción para cada fragmento.
@@ -1080,8 +1080,8 @@ def gemini_translate_text_im_espanol(_model, result_eng_transcript, generation_c
         translated_text: cadena de texto que contiene el texto traducido
     """
     # Divide el texto en fragmentos de tamaño chunk_size
-    chunk_size = 300
-    chunks_script = [result_eng_transcript[i:i + chunk_size] for i in range(0, len(result_eng_transcript), chunk_size)]
+    chunk_size = 200
+    chunks_script = [result_want_transcript[i:i + chunk_size] for i in range(0, len(result_want_transcript), chunk_size)]
     response_text = []
 
     for chunk in chunks_script:
@@ -1125,7 +1125,7 @@ def gemini_translate_text_im_espanol(_model, result_eng_transcript, generation_c
     
     return translated_text
 @st.cache_data
-def gemini_translate_text_im_fran(_model, result_eng_transcript, generation_config): 
+def gemini_translate_text_im_fran(_model,result_want_transcript, generation_config): 
     """
     Divise le texte en parties de taille spécifique et génère la traduction pour chaque fragment.
     
@@ -1139,8 +1139,8 @@ def gemini_translate_text_im_fran(_model, result_eng_transcript, generation_conf
         translated_text : chaîne de caractères contenant le texte traduit
     """
     # Divise le texte en fragments de taille chunk_size
-    chunk_size = 300
-    chunks_script = [result_eng_transcript[i:i + chunk_size] for i in range(0, len(result_eng_transcript), chunk_size)]
+    chunk_size = 200
+    chunks_script = [result_want_transcript[i:i + chunk_size] for i in range(0, len(result_want_transcript), chunk_size)]
     response_text = []
 
     for chunk in chunks_script:
@@ -1378,20 +1378,13 @@ else:
                                         #display_chat_message("assistant", dot_Check)
                                             # 문장 구분이 필요한 단어 리스트
                                         keyword = [
-                                        "I ", "And ", "But ", "Now ", "What", "How", "Have", "Did", "In ", 
-                                        "Then", "Or", "Why", "Yes", "If ", "When", "Because", 
-                                        "Well", "Oh ", "Ah  ", "Okay", "Alright", 
-                                        "Therefore", "However", "Moreover", "Though", "Although", 
-                                        "You", "They",
-                                        "Yet", "Still", "Nonetheless", "Nevertheless", 
-                                        "After", "Before", "Until", "While", "Since", "Once", 
-                                        "Thus", "Hence", "Consequently", "Unless", "Whether", "As", 
-                                        "Indeed", "Certainly", "Surely", 
-                                        "We", "It  ", "He  ", "She ", "This ", "That ", "These", "Those",
-                                        "For instance",  
-                                        "Such as", "For example", "Like", "On the other hand",
-                                         "There " ,""
-                                        "To summarize" 
+                                              # 전치사 및 접속사 (대문자로 시작)
+                                        "And ", "But ", "What", "How", "Who", "Have", "Did", "If ", "When", "Because", 
+                                        "Then", "Or", "Why", "Although", "Though", "After", "Before", "Until", 
+                                        "While", "Since", "Once", "Thus", "Hence", "Consequently", "Unless", "Whether", 
+                                        "Therefore", "However", "Moreover", "Yet", "Still", "Nonetheless", "Nevertheless", 
+                                        "For instance", "Such as", "For example", "On the other hand", "To summarize", "Otherwise",
+                                    
                                     ]
                                         for word in keyword:
                                             read_script  = read_script.replace(word , f".{word}")
@@ -1474,55 +1467,73 @@ else:
                             
                             
                             result_if_too_Long = ""
-                            
-                            #if dot_Check == False and want_language == "English":
+
+
+                            keywords = [
+                            # 전치사 및 접속사
+                            # "And ", "and ", "But ", "but ", "What", "what", "How", "how", "Who","who",
+                            # "Have", "Did", "did", "If ", "if ", "When", "when", "Because", "because",
+                            # "Then", "then", "Or", "Why", "why", "Although", "although", 
+                            # "Though", "though", "After", "after", "Before", "Until", 
+                            # "While", "while", "Since", "since", "Once", "once", "Thus", "thus", "Hence", "hence", 
+                            # "Consequently", "Unless", "unless", "Whether", "whether", "Therefore", 
+                            # "therefore", "However", "however", "Moreover", "moreover", "Yet", "yet", "Still", 
+                            # "Nonetheless", "Nevertheless" , "For instance", "for instance", 
+                            # "Such as", "For example", "for example", "On the other hand", 
+                            # "on the other hand", "To summarize", "to summarize","Otherwise","otherwise"
+                            # 전치사 및 접속사 (소문자로 시작)
+                            "and ", "but ", "what", "how ", "who ", "did ", "if ", "when", "because", 
+                            "then", "or", "why", "although", "though", "after", "before", "while", 
+                            "since", "once", "thus", "hence", "unless", "whether", "therefore", 
+                            "however", "moreover", "yet", "still", "for instance", "such as", 
+                            "for example", "on the other hand", "to summarize", "otherwise","or "
+                            #대명사 및 기타 단어 (대문자로 시작)
+                            "I ","I'm" "I've", "We", "You", "They", "It ","It's", "He ", "She ", 
+                            "This ", "That ", "These", "Those", 
+                            "Indeed", "Certainly", "Surely", "Alright", "There ",
+
+                            # 대명사 및 기타 단어 (소문자로 시작)
+                            "i ", "i've","i'm", "we", "you","they", "it ","it's", "he ","he's", "she ","she's" 
+                            "this ", "these", "those", 
+                            "indeed", "certainly", "surely", "alright", "there "
+                        ]
+                            pattern = r'(\b(?:' + '|'.join(map(re.escape, keywords)) + r'))'  # 모든 키워드를 포함한 정규식
+
+                            result_if_too_Long = ""
+
                             for line in result_want_script:
                                 if len(line) > 230:
-                                    keywords = ["and ", "but ", "there", "if ", "do ","it " ,"he ","what","you","she","that","they","how","or ",]
                                     start = 0  # 검색 시작 위치
-                                
-                                
-                                
-                                while start < len(line):  # 줄 끝까지 처리
-                                    # 각 키워드의 위치 찾기
-                                    # index_list = [line.find(word, start) for word in keywords]
-                                    # index_list = [i for i in index_list if i != -1]  # -1 값 제거
-                                    index_list = [line.find(word, start) for word in keywords]
-                                    index_list = [i for i in index_list if i != -1 and line[i-1].isalpha() == False] 
-                                    index_list = sorted(index_list)
-                                    #display_chat_message("assistant" , index_list)
-                                    # 키워드가 없는 경우 종료
-                                    if not index_list:
-                                        break
-
-                                    # 각 index에 대해 처리
-                                    found_valid = False  # 조건을 충족하는 키워드가 있는지 확인하는 변수
-                                    for index in index_list:
                                     
-                                        dot_index = len(line)  # "."이 없으면, 줄 끝까지 처리
+                                    while start < len(line):
+                                        matches = list(re.finditer(pattern, line[start:]))  # 남은 문자열에서 모든 키워드 찾기
                                         
-                                        # 조건 확인
-                                        if len(line[start:index]) >= 100 and len(line[index:dot_index]) >= 100:
-                                            # 키워드 앞에 ".\n" 추가
-                                            word = next(word for word in keywords if line.find(word, start) == index)
-                                            line = line[:index] + f".\n{word}" + line[index + len(word):]
-                                            lines = f".\n{word}" + line[index + len(word):]
-                                            
-
-                                            # `start`를 삽입 후 위치로 업데이트
-                                            start = index + len(f".\n{word}")
-                                            found_valid = True
+                                        if not matches:  # 더 이상 매칭된 키워드가 없으면 종료
                                             break
-                                                
+                                        
+                                        found_valid = False
+                                        for match in matches:
+                                            keyword_start = start + match.start(1)  # 매칭된 키워드의 시작 위치
+                                            keyword_end = start + match.end(1)     # 매칭된 키워드의 끝 위치
 
-                                    # 조건을 만족하는 키워드가 없으면 start를 다음 위치로 업데이트
-                                    if found_valid ==  False:
-                                        start = index + 1
+                                            # 키워드 앞에 다른 알파벳이 없는 경우만 처리
+                                            if keyword_start > 0 and line[keyword_start - 1].isalpha():
+                                                continue
+                                            
+                                            # 조건 확인: 키워드 앞뒤로 100자 이상인지
+                                            if len(line[start:keyword_start]) >= 125 and len(line[keyword_end:]) >= 125:
+                                                # 키워드 앞에 ".\n" 추가
+                                                line = line[:keyword_start] + ".\n" + line[keyword_start:]
+                                                start = keyword_end + 2  # ".\n"의 길이를 추가하여 다음 검색 시작 위치 갱신
+                                                found_valid = True
+                                                break  # 조건을 만족하면 다음 반복으로 이동
 
-                                    
-                                    # 변환된 줄을 결과에 추가
-                                result_if_too_Long += line
-                                result_if_too_Long += "\n"
+                                        if not found_valid:
+                                            # 조건을 만족하는 키워드가 없으면 start를 다음 키워드 이후로 이동
+                                            start = keyword_end
+
+                                result_if_too_Long += line + "\n"
+
 
                             # 결과 확인
                             
@@ -1741,6 +1752,10 @@ else:
                             #similarity_matrix = cosine_similarity(english_embeddings, korean_embeddings) 
 
                             # 유사도가 가장 높은 문장끼리 매칭
+                            
+                            
+
+
                             time_list  = []
                             merged_lines = ["\n\n\n"]
                             used_korean_indices = set() # 사용한 한국어는 지우기 위해 집합 사용
@@ -1785,18 +1800,33 @@ else:
                                 merged_lines.append(eng_sentence)
                                 merged_lines.append("\n\n")
                                 merged_lines.append(kor_sentence)
+                               
+                                                      
+                                
+                                #시간이 부정확한 제미니가 있어서 그부분을 바꾸고 중복 단어도 보여주게 했다 계속보면서 공부하게        
+                                #사람에 따라서 불편한점이 있을듯 제미니가 해결되면 전환해도..?
 
-                                if time_judge:  # time_judge가 None이 아닐 때
-                                    time_str = time_judge.group(0) 
-                                    for j in range(len(adw_script)):
-                                        if time_str in adw_script[j]:
-                                            adw_replace_time = adw_script[j].replace(time_str,"")
-                                            adw_index = adw_replace_time.find(":") 
-                                            if adw_script[j].find(adw_replace_time[2:adw_index]):
-                                                merged_lines.append("\n")
-                                                merged_lines.append(adw_script[j].replace(time_str,""))
-                                                 
-                                    merged_lines.append("\n\n")      
+                                if time_judge: 
+                                    time_str = time_judge.group(0)
+                                    for j, script_line in enumerate(adw_script):
+                                        if not script_line.strip():
+                                            continue
+
+                                        if time_str:
+                                            adw_time_judge = re.search(r"\[(\d{2}:\d{2})\]", script_line)
+                                            if adw_time_judge:
+                                                adw_time_str = adw_time_judge.group(0)
+                                                adw_replace_time = script_line.replace(adw_time_str, "")
+                                                adw_index = adw_replace_time.find(":")
+                                                                                                
+                                                if adw_index != -1:
+                                                   
+                                                    if eng_sentence.find(adw_replace_time[2:adw_index]) != -1:
+                                                      
+                                                        merged_lines.append("\n")
+                                                        merged_lines.append(adw_replace_time)
+
+                                    merged_lines.append("\n\n")
                                 else:
                                     merged_lines.append("\n")
                                                
@@ -1863,7 +1893,7 @@ else:
                             display_chat_message("assistant", "해당 서비스는 쿠팡 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.")
             except Exception as e:
                 # list_available_languages에서 에러가 발생하면 처리
-                st.warning(f"YouTube subtitles access is restricted. Please choose another video")
+                st.warning(f"YouTube subtitles access is restricted. Please choose another video{e}")
     except Exception as e:
         # transcript_list 초기화에서 에러가 발생하면 처리
          st.warning(f"YouTube subtitles access is restricted. Please choose another video.") 
