@@ -9,7 +9,8 @@ def get_video_info(url):
             'no_warnings': True,
             'extract_flat': True,
             'skip_download': True,  # 다운로드 건너뛰기
-            'prefer_ffmpeg': False
+            'prefer_ffmpeg': False,
+            'cookies-from-browser': True,        
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
@@ -128,6 +129,7 @@ def create_modern_ui():
     
     # 비디오 정보 표시
     if url:
+       
         video_info = get_video_info(url)
         if video_info:
             with st.container():
