@@ -20,6 +20,8 @@ RUN pip install -r requirements.txt --root-user-action=ignore
 # COPY model_download.py /app/model_download.py
 # RUN python /app/model_download.py
 
+COPY cookies.txt ./cookies.txt
+
 # 로고 이미지
 COPY ./image/shadowLogo2.png /app/image/shadowLogo2.png
 COPY ./image/shadowLogo.png /app/image/shadowLogo.png
