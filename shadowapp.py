@@ -1,29 +1,124 @@
 import streamlit as st
 
+#yt_dlp 새해 기념으로 유튜브에서 밴하였음
+#쿠키로 허용가능하게 할수있지만 최근 전부 사용불가해졌음 유튜브 api 를 통해 변경
 import yt_dlp
+import streamlit as st
+from io import BytesIO
+from docx import Document
 
-def get_video_info(url):
-    try:
-        ydl_opts = {
-            'quiet': True,
-            'no_warnings': True,
-            'extract_flat': True,
-            'skip_download': True,  # 다운로드 건너뛰기
-            'prefer_ffmpeg': False,
-            'cookies-from-browser': True,        
-        }
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=False)
+import streamlit as st
+from io import BytesIO
+from docx import Document
+from docx.shared import Pt
+from docx.oxml.ns import qn
+from docx.oxml import OxmlElement
+
+from docx import Document
+from docx.shared import Pt
+from docx.oxml.ns import qn
+from docx.oxml import OxmlElement
+from io import BytesIO
+from urllib.parse import urlparse, parse_qs
+import yt_dlp
+from youtube_transcript_api import YouTubeTranscriptApi
+
+
+from docx import Document
+from docx.shared import Pt
+from io import BytesIO
+
+from docx.oxml import OxmlElement
+# def get_video_info(url):
+#     try:
+#         # # with open('cookies.json', 'r') as f:
+#         # #     cookies = json.load(f)
+#         ydl_opts = {
+#             'quiet': True,
+#             'no_warnings': True,
+#             'extract_flat': True,
+#             'skip_download': True,  # 다운로드 건너뛰기
+#             'prefer_ffmpeg': False,
+            
+
+#         }
+    
+#         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+#             info = ydl.extract_info(url, download=False)
+#             return {
+#                 'title': info.get('title'),
+#                 'channel': info.get('uploader'),
+#                 'thumbnail': info.get('thumbnail'),
+#                 'duration': info.get('duration'),
+#                 'view_count': info.get('view_count')
+#             }
+#     except Exception as e:
+#         st.error(f"비디오 정보를 가져오는데 실패했습니다: {str(e)}")
+#         return None
+import requests    
+@st.cache_data
+def get_video_id(url):
+    """URL에서 유튜브 비디오 ID 추출"""
+    parsed_url = urlparse(url)
+    
+    # 일반 유튜브 URL (https://www.youtube.com/watch?v=비디오ID)
+    if parsed_url.hostname == 'www.youtube.com' and parsed_url.path == '/watch':
+        return parse_qs(parsed_url.query).get('v', [None])[0]
+    
+    # 짧은 URL 형식 (https://youtu.be/비디오ID)
+    if parsed_url.hostname == 'youtu.be':
+        return parsed_url.path[1:]
+    
+    # 임베드 URL 형식 (https://www.youtube.com/embed/비디오ID)
+    if parsed_url.hostname == 'www.youtube.com' and parsed_url.path.startswith('/embed/'):
+        return parsed_url.path.split('/')[2]
+    
+    # 유튜브 쇼츠 URL 형식 (https://www.youtube.com/shorts/비디오ID)
+    if parsed_url.hostname == 'www.youtube.com' and parsed_url.path.startswith('/shorts/'):
+        return parsed_url.path.split('/')[2]
+    
+    return None
+
+def get_video_info(url, youtube_api_key_):
+    # URL에서 비디오 ID 추출
+    video_id = get_video_id(url)  # 'v=' 뒤에 오는 ID를 추출하는 방법
+    # API 요청 URL 구성
+    api_url = f"https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id={video_id}&key={youtube_api_key_}"
+    
+    # API 요청
+    response = requests.get(api_url)
+    
+    # 응답이 정상적인지 확인
+    if response.status_code == 200:
+        video_info = response.json()
+        
+        # 'items' 리스트가 비어있지 않은지 확인
+        if 'items' in video_info and len(video_info['items']) > 0:
+            # 통계 정보와 스니펫 정보, 콘텐츠 세부 정보 추출
+            statistics = video_info['items'][0].get('statistics', {})
+            snippet = video_info['items'][0].get('snippet', {})
+            content_details = video_info['items'][0].get('contentDetails', {})
+            
+            # duration 정보가 없을 경우 기본값 처리
+            duration = content_details.get('duration', '정보 없음')
+            
+            # 필요한 정보 반환
             return {
-                'title': info.get('title'),
-                'channel': info.get('uploader'),
-                'thumbnail': info.get('thumbnail'),
-                'duration': info.get('duration'),
-                'view_count': info.get('view_count')
+                'title': snippet.get('title'),
+                'channel': snippet.get('channelTitle'),
+                'description': snippet.get('description'),
+                'thumbnail': snippet.get('thumbnails', {}).get('high', {}).get('url', None),
+                'statistics': statistics,
+                #'duration': duration
             }
-    except Exception as e:
-        st.error(f"비디오 정보를 가져오는데 실패했습니다: {str(e)}")
+        else:
+            print("비디오 정보를 찾을 수 없습니다.")
+            return None
+    else:
+        print(f"API 요청 실패: {response.status_code}")
         return None
+    
+
 
 import base64
 def create_modern_ui():
@@ -126,11 +221,14 @@ def create_modern_ui():
         placeholder="https://www.youtube.com/watch?v=...",
         label_visibility="collapsed"
     )
+    # video_id 추출
+   
     
     # 비디오 정보 표시
     if url:
-       
-        video_info = get_video_info(url)
+        youtube_api_key = "AIzaSyD0UwH5A3yUn50npxpHLkM7VEuaC6GRlqw"
+        video_info = get_video_info(url,youtube_api_key)
+        
         if video_info:
             with st.container():
                 col1, col2 = st.columns([1, 3])
@@ -140,9 +238,10 @@ def create_modern_ui():
                     st.markdown(f"#### {video_info['title']}")
                     st.caption(f"📺 {video_info['channel']}")
                     # 추가 정보 표시
-                    duration_min = video_info['duration'] // 60
-                    duration_sec = video_info['duration'] % 60
-                    st.caption(f"⏱️ {duration_min}:{duration_sec:02d} | 👀 {video_info['view_count']:,} views")
+                    # duration_min = video_info['duration'] // 60
+                    # duration_sec = video_info['duration'] % 60
+                 
+                   # st.caption(f"⏱️ {duration_min}:{duration_sec:02d} | 👀 {video_info['view_count']:,} views")
         
     # 처리 버튼
     if st.button("🎯 Generate Shadowing Materials", type="primary", use_container_width=True):
@@ -232,32 +331,7 @@ def display_chat_message(role, content):
         </div>
     """, unsafe_allow_html=True)
   
-import streamlit as st
-from io import BytesIO
-from docx import Document
 
-import streamlit as st
-from io import BytesIO
-from docx import Document
-from docx.shared import Pt
-from docx.oxml.ns import qn
-from docx.oxml import OxmlElement
-
-from docx import Document
-from docx.shared import Pt
-from docx.oxml.ns import qn
-from docx.oxml import OxmlElement
-from io import BytesIO
-from urllib.parse import urlparse, parse_qs
-import yt_dlp
-from youtube_transcript_api import YouTubeTranscriptApi
-
-
-from docx import Document
-from docx.shared import Pt
-from io import BytesIO
-
-from docx.oxml import OxmlElement
 
 import os
 for key, value in os.environ.items():
@@ -640,9 +714,7 @@ def get_best_learn_code(video_id , learn_code, _transcript_list):
 
 
 
-# video_id 추출
-user_input= url
-video_id = get_video_id(user_input)
+
 
 
 
@@ -1188,10 +1260,40 @@ def gemini_translate_text_im_fran(_model,result_want_transcript, generation_conf
 
 import streamlit as st
 
+
 def create_settings_sidebar():
     with st.sidebar:
         st.title("🛠️ SETTING")
+        #st.subheader("Developer's blog")
         
+        # st.markdown("""
+        #     <a href="https://fktshin.tistory.com/15" 
+        #        target="_blank"
+        #        style="text-decoration: none;">
+        #         <div style="background-color: #A8E6CF; 
+        #                     padding: 7px 20px; 
+        #                     border-radius: 10px; 
+        #                     text-align: center; 
+        #                     margin: 10px 0;
+        #                     display: inline-block;
+        #                     width: 100%;
+        #                     box-sizing: border-box;
+        #                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        #                     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);">
+        #             <div style="display: flex; 
+        #                         align-items: center; 
+        #                         justify-content: center; 
+        #                         gap: 8px;
+        #                         color: #1a1a1a;
+        #                         font-size: 14px;
+        #                         font-weight: 500;
+        #                         letter-spacing: 0.25px;">
+        #                 <span style="color: #1a1a1a;">🌱</span>
+        #                 <span style="color: #1a1a1a;">Visit Blog!</span>
+        #             </div>
+        #         </div>
+        #     </a>
+        #     """, unsafe_allow_html=True)
         # Gemini API 설정 섹션
         st.header("API Setting")
         api_key = st.text_input(
@@ -1253,35 +1355,35 @@ def create_settings_sidebar():
             step=1
         )
 
-        st.subheader("Developer's blog")
-        st.markdown("""
-            <a href="https://fktshin.tistory.com/15" 
-               target="_blank"
-               style="text-decoration: none;">
-                <div style="background-color: #A8E6CF; 
-                            padding: 7px 20px; 
-                            border-radius: 10px; 
-                            text-align: center; 
-                            margin: 10px 0;
-                            display: inline-block;
-                            width: 100%;
-                            box-sizing: border-box;
-                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);">
-                    <div style="display: flex; 
-                                align-items: center; 
-                                justify-content: center; 
-                                gap: 8px;
-                                color: #1a1a1a;
-                                font-size: 14px;
-                                font-weight: 500;
-                                letter-spacing: 0.25px;">
-                        <span style="color: #1a1a1a;">🌱</span>
-                        <span style="color: #1a1a1a;">Visit Blog!</span>
-                    </div>
-                </div>
-            </a>
-            """, unsafe_allow_html=True)
+        # st.subheader("Developer's blog")
+        # st.markdown("""
+        #     <a href="https://fktshin.tistory.com/15" 
+        #        target="_blank"
+        #        style="text-decoration: none;">
+        #         <div style="background-color: #A8E6CF; 
+        #                     padding: 7px 20px; 
+        #                     border-radius: 10px; 
+        #                     text-align: center; 
+        #                     margin: 10px 0;
+        #                     display: inline-block;
+        #                     width: 100%;
+        #                     box-sizing: border-box;
+        #                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        #                     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);">
+        #             <div style="display: flex; 
+        #                         align-items: center; 
+        #                         justify-content: center; 
+        #                         gap: 8px;
+        #                         color: #1a1a1a;
+        #                         font-size: 14px;
+        #                         font-weight: 500;
+        #                         letter-spacing: 0.25px;">
+        #                 <span style="color: #1a1a1a;">🌱</span>
+        #                 <span style="color: #1a1a1a;">Visit Blog!</span>
+        #             </div>
+        #         </div>
+        #     </a>
+        #     """, unsafe_allow_html=True)
         
         return {
             "api_key": api_key,
@@ -1304,7 +1406,8 @@ want_font = settings['want_font']
 font_size = settings['font_size']
 api_key = settings['api_key']
 
-
+user_input= url
+video_id = get_video_id(user_input) 
 
 if video_id is None :
     display_chat_message("assistant", "Please check the URL address again.")
@@ -1312,6 +1415,7 @@ if video_id is None :
 else:
     try:
         # transcript_list 초기화
+       
         title_video = get_video_title(video_id)
         try:
             transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
