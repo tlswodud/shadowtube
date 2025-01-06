@@ -1427,13 +1427,12 @@ else:
         # 채팅 처리
         if user_input:
             # 사용자 메시지 표시
-            st.markdown("""<a href="https://link.coupang.com/a/b4Z0hb" target="_blank" referrerpolicy="unsafe-url">
-                        <img src="https://img4a.coupangcdn.com/image/affiliate/widget/image/2024/11/25/03a1609c92ee009c010ecaed3566ed44.png" 
-                        alt=""style=" margin-bottom:15px"></a>""",unsafe_allow_html=True)
+            # st.markdown("""<a href="https://link.coupang.com/a/b4Z0hb" target="_blank" referrerpolicy="unsafe-url">
+            #             <img src="https://img4a.coupangcdn.com/image/affiliate/widget/image/2024/11/25/03a1609c92ee009c010ecaed3566ed44.png" 
+            #             alt=""style=" margin-bottom:15px"></a>""",unsafe_allow_html=True)
            
             #display_chat_message("user", user_input)
 
-            # AI 응답 (예시)
             ai_response = "Checking your video... Bot is running!"
 
             try:
@@ -1988,18 +1987,18 @@ else:
                             #display_chat_message("assistant","I've completed it! Expand your world!")
                             st.balloons()
                             
-                            # st.markdown("""
-                            # <iframe src="https://ads-partners.coupang.com/widgets.html?id=823342&template=carousel&trackingCode=AF4610152&subId=&width=680&height=120&tsource=" 
-                            #         width="680" height="100" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" browsingtopics></iframe>
-                            # """, unsafe_allow_html=True)
-                            st.markdown("""<a href="https://link.coupang.com/a/b40cin" target="_blank" referrerpolicy="unsafe-url">
-                            <img src="https://image11.coupangcdn.com/image/cmg/oms/banner/0ebebf1e-2dc2-423b-933a-3a9f14dac987_980x150.jpg" 
-                            alt=""style=" margin-bottom:15px"></a>""",unsafe_allow_html=True)
+                            st.markdown("""
+                            <iframe src="https://ads-partners.coupang.com/widgets.html?id=823342&template=carousel&trackingCode=AF4610152&subId=&width=680&height=120&tsource=" 
+                                    width="680" height="100" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" browsingtopics></iframe>
+                            """, unsafe_allow_html=True)
+                            # st.markdown("""<a href="https://link.coupang.com/a/b40cin" target="_blank" referrerpolicy="unsafe-url">
+                            # <img src="https://image11.coupangcdn.com/image/cmg/oms/banner/0ebebf1e-2dc2-423b-933a-3a9f14dac987_980x150.jpg" 
+                            # alt=""style=" margin-bottom:15px"></a>""",unsafe_allow_html=True)
                             
                             display_chat_message("assistant", "해당 서비스는 쿠팡 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.")
             except Exception as e:
                 # list_available_languages에서 에러가 발생하면 처리
-                st.warning(f"YouTube subtitles access is restricted. Please choose another video{e}")
+                st.warning(f"YouTube subtitles access is restricted. Please choose another video")
     except Exception as e:
         # transcript_list 초기화에서 에러가 발생하면 처리
          st.warning(f"YouTube subtitles access is restricted. Please choose another video.") 
