@@ -1420,7 +1420,7 @@ else:
         try:
             transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
         except:
-            display_chat_message("google Ban this service...Really?")
+           st.warning("Google banned this service...{e}")
         
         print("api_work")
                                    
